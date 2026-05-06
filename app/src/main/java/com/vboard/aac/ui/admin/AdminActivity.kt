@@ -31,57 +31,48 @@ class AdminActivity : AppCompatActivity() {
     private fun setupAdminCards() {
         setupCard(
             binding.cardVocab.root,
-            R.drawable.bg_icon_circle,
-            android.R.drawable.ic_menu_agenda,
+            R.drawable.vb_ic_edit,
             "Quản lý từ vựng",
-            "Thêm, sửa, xóa thẻ từ vựng"
+            "Thêm, sửa, xoá thẻ từ vựng",
         ) { startActivity(Intent(this, EditActivity::class.java)) }
 
         setupCard(
             binding.cardVoice.root,
-            R.drawable.bg_icon_circle,
-            android.R.drawable.ic_lock_silent_mode_off,
+            R.drawable.vb_ic_volume_up,
             "Cài đặt giọng đọc",
-            "Âm lượng, giọng nói"
+            "Âm lượng, giọng nói",
         ) { startActivity(Intent(this, VoiceSettingsActivity::class.java)) }
 
         setupCard(
             binding.cardUI.root,
-            R.drawable.bg_icon_circle,
-            android.R.drawable.ic_menu_manage,
-            "Cài đặt giao diện",
-            "Chế độ sáng/tối, lưới màn hình"
+            R.drawable.vb_ic_palette,
+            "Giao diện",
+            "Chế độ sáng/tối, lưới màn hình",
         ) { startActivity(Intent(this, UISettingsActivity::class.java)) }
 
         setupCard(
             binding.cardStats.root,
-            R.drawable.bg_icon_circle,
-            android.R.drawable.ic_menu_sort_by_size,
+            R.drawable.vb_ic_chart,
             "Thống kê sử dụng",
-            "Xem lịch sử giao tiếp"
+            "Số câu, từ phổ biến, biểu đồ",
         ) { startActivity(Intent(this, StatsActivity::class.java)) }
 
         setupCard(
             binding.cardBackup.root,
-            R.drawable.bg_icon_circle,
-            android.R.drawable.ic_menu_save,
-            "Sao lưu & Khôi phục",
-            "Xuất/Nhập kho từ vựng JSON"
+            R.drawable.vb_ic_save,
+            "Sao lưu & khôi phục",
+            "Xuất/nhập kho từ vựng JSON",
         ) { startActivity(Intent(this, BackupActivity::class.java)) }
     }
 
     private fun setupCard(
         cardView: View,
-        iconBg: Int,
         iconRes: Int,
         title: String,
         subtitle: String,
-        onClick: () -> Unit
+        onClick: () -> Unit,
     ) {
-        cardView.findViewById<LinearLayout>(R.id.iconContainer)
-            .setBackgroundResource(iconBg)
-        cardView.findViewById<ImageView>(R.id.icon)
-            .setImageResource(iconRes)
+        cardView.findViewById<ImageView>(R.id.icon).setImageResource(iconRes)
         cardView.findViewById<TextView>(R.id.title).text = title
         cardView.findViewById<TextView>(R.id.subtitle).text = subtitle
         cardView.setOnClickListener { onClick() }
