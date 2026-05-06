@@ -3,179 +3,224 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/vb_system_background"
     android:orientation="vertical">
 
-    <!-- Header -->
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/spacing_md"
-        android:paddingVertical="@dimen/spacing_md">
-
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_revert"
-            android:contentDescription="Quay lại" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/ui_settings_title"
-            android:textColor="@color/primary"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
+        android:layout_height="@dimen/vb_topappbar_height"
+        android:background="@color/vb_secondary_system_background">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/vb_space_md"
+            android:paddingEnd="@dimen/vb_space_md">
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Lùi"
+                android:src="@drawable/vb_ic_chevron_left"
+                app:tint="@color/vb_accent" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/ui_settings_title"
+                android:textAppearance="@style/TextAppearance.VBoard.Headline"
+                android:textColor="@color/vb_label" />
+            <View android:layout_width="44dp" android:layout_height="44dp" />
+        </LinearLayout>
         <View
-            android:layout_width="48dp"
-            android:layout_height="48dp" />
-    </LinearLayout>
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/vb_hairline"
+            android:layout_gravity="bottom"
+            android:background="@color/vb_separator" />
+    </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/spacing_lg">
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Grid Columns -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_md"
-                android:text="@string/ui_grid_columns"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:paddingStart="@dimen/vb_space_md"
+                android:paddingEnd="@dimen/vb_space_md"
+                android:paddingTop="@dimen/vb_space_md"
+                android:paddingBottom="@dimen/vb_space_xs"
+                android:textAppearance="@style/TextAppearance.VBoard.Overline"
+                android:text="HIỂN THỊ" />
 
-            <LinearLayout
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_xl"
-                android:orientation="horizontal">
-
+                android:layout_marginStart="@dimen/vb_space_md"
+                android:layout_marginEnd="@dimen/vb_space_md"
+                app:cardBackgroundColor="@color/vb_secondary_system_background"
+                app:cardCornerRadius="@dimen/vb_radius_md"
+                app:cardElevation="@dimen/vb_elevation_e1">
                 <LinearLayout
-                    android:id="@+id/grid2"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_marginEnd="@dimen/spacing_md"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_round"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="2 Cột"
-                        android:textColor="@color/on_surface"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/grid3"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_marginEnd="@dimen/spacing_md"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_round"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="3 Cột"
-                        android:textColor="@color/on_surface"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/grid4"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_button_round"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4 Cột"
-                        android:textColor="@color/on_surface"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Dark Mode -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_md"
-                android:text="@string/ui_theme"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDarkMode"
-                android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginBottom="@dimen/spacing_xl"
-                android:text="Chế độ Sáng"
-                app:backgroundTint="@color/surface_container_high"
-                app:cornerRadius="@dimen/radius_full"
-                android:textColor="@color/on_surface" />
-
-            <!-- Text Labels -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_settings_card"
-                android:orientation="horizontal"
-                android:padding="@dimen/spacing_lg">
-
-                <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Grid columns row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/ui_text_labels"
-                        android:textColor="@color/on_surface"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:orientation="vertical"
+                        android:padding="@dimen/vb_space_md">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.VBoard.Body"
+                            android:textFontWeight="500"
+                            android:text="@string/ui_grid_columns" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/vb_space_sm"
+                            android:orientation="horizontal">
+
+                            <com.vboard.aac.ui.common.VBoardCardView
+                                android:id="@+id/grid2"
+                                android:layout_width="0dp"
+                                android:layout_height="56dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/vb_space_xs"
+                                app:cardBackgroundColor="@color/vb_system_background"
+                                app:cardCornerRadius="@dimen/vb_radius_sm"
+                                app:cardElevation="@dimen/vb_elevation_e0">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:textAppearance="@style/TextAppearance.VBoard.Headline"
+                                    android:textColor="@color/vb_label"
+                                    android:text="2" />
+                            </com.vboard.aac.ui.common.VBoardCardView>
+
+                            <com.vboard.aac.ui.common.VBoardCardView
+                                android:id="@+id/grid3"
+                                android:layout_width="0dp"
+                                android:layout_height="56dp"
+                                android:layout_weight="1"
+                                android:layout_marginEnd="@dimen/vb_space_xs"
+                                app:cardBackgroundColor="@color/vb_system_background"
+                                app:cardCornerRadius="@dimen/vb_radius_sm"
+                                app:cardElevation="@dimen/vb_elevation_e0">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:textAppearance="@style/TextAppearance.VBoard.Headline"
+                                    android:textColor="@color/vb_label"
+                                    android:text="3" />
+                            </com.vboard.aac.ui.common.VBoardCardView>
+
+                            <com.vboard.aac.ui.common.VBoardCardView
+                                android:id="@+id/grid4"
+                                android:layout_width="0dp"
+                                android:layout_height="56dp"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="@color/vb_system_background"
+                                app:cardCornerRadius="@dimen/vb_radius_sm"
+                                app:cardElevation="@dimen/vb_elevation_e0">
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:gravity="center"
+                                    android:textAppearance="@style/TextAppearance.VBoard.Headline"
+                                    android:textColor="@color/vb_label"
+                                    android:text="4" />
+                            </com.vboard.aac.ui.common.VBoardCardView>
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/vb_hairline"
+                        android:layout_marginStart="@dimen/vb_space_md"
+                        android:background="@color/vb_separator" />
+
+                    <!-- Dark mode row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_xs"
-                        android:text="@string/ui_text_labels_desc"
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:padding="@dimen/vb_space_md">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.VBoard.Body"
+                            android:textFontWeight="500"
+                            android:text="@string/ui_theme" />
+
+                        <Button
+                            android:id="@+id/btnDarkMode"
+                            style="@style/Widget.VBoard.Button.Tinted"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/vb_space_sm"
+                            android:text="Chế độ Sáng" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/vb_hairline"
+                        android:layout_marginStart="@dimen/vb_space_md"
+                        android:background="@color/vb_separator" />
+
+                    <!-- Show labels switch -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/vb_space_md">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/TextAppearance.VBoard.Body"
+                                android:textFontWeight="500"
+                                android:text="@string/ui_text_labels" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/TextAppearance.VBoard.Caption1"
+                                android:text="@string/ui_text_labels_desc" />
+                        </LinearLayout>
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/switchLabels"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
+                    </LinearLayout>
                 </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switchLabels"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:checked="true" />
-            </LinearLayout>
+            <Space android:layout_width="match_parent" android:layout_height="@dimen/vb_space_md" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
