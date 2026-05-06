@@ -3,112 +3,130 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/vb_system_background"
     android:orientation="vertical">
 
-    <!-- Header -->
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/spacing_md"
-        android:paddingVertical="@dimen/spacing_lg">
-
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Quay lại"
-            android:src="@android:drawable/ic_menu_revert"
-            app:tint="@color/primary" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="@string/backup_restore_title"
-            android:textColor="@color/primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <View
-            android:layout_width="48dp"
-            android:layout_height="48dp" />
-    </LinearLayout>
+        android:layout_height="@dimen/vb_topappbar_height"
+        android:background="@color/vb_secondary_system_background">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/vb_space_md"
+            android:paddingEnd="@dimen/vb_space_md">
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Lùi"
+                android:src="@drawable/vb_ic_chevron_left"
+                app:tint="@color/vb_accent" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="@string/backup_restore_title"
+                android:textAppearance="@style/TextAppearance.VBoard.Headline"
+                android:textColor="@color/vb_label" />
+            <View android:layout_width="44dp" android:layout_height="44dp" />
+        </LinearLayout>
+        <View android:layout_width="match_parent" android:layout_height="@dimen/vb_hairline"
+            android:layout_gravity="bottom" android:background="@color/vb_separator" />
+    </FrameLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="@dimen/spacing_lg">
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Info Card -->
-            <LinearLayout
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/vb_space_md"
+                android:paddingEnd="@dimen/vb_space_md"
+                android:paddingTop="@dimen/vb_space_md"
+                android:paddingBottom="@dimen/vb_space_xs"
+                android:textAppearance="@style/TextAppearance.VBoard.Overline"
+                android:text="VỀ SAO LƯU" />
+
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/spacing_xl"
-                android:background="@drawable/bg_settings_card"
-                android:orientation="vertical"
-                android:padding="@dimen/spacing_xl">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sao lưu kho từ vựng"
-                    android:textColor="@color/on_surface"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
+                android:layout_marginStart="@dimen/vb_space_md"
+                android:layout_marginEnd="@dimen/vb_space_md"
+                app:cardBackgroundColor="@color/vb_secondary_system_background"
+                app:cardCornerRadius="@dimen/vb_radius_md"
+                app:cardElevation="@dimen/vb_elevation_e1">
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/spacing_sm"
-                    android:text="Xuất toàn bộ thư mục và thẻ từ vựng ra file JSON. Dùng để chuyển sang thiết bị khác hoặc lưu trữ an toàn."
-                    android:textColor="@color/on_surface_variant"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:padding="@dimen/vb_space_md">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.VBoard.Body"
+                        android:textFontWeight="500"
+                        android:text="Sao lưu kho từ vựng" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/vb_space_2xs"
+                        android:textAppearance="@style/TextAppearance.VBoard.Caption1"
+                        android:text="Xuất toàn bộ thư mục và thẻ từ vựng ra file JSON. Dùng để chuyển sang thiết bị khác hoặc lưu trữ an toàn." />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Export Button -->
-            <com.google.android.material.button.MaterialButton
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/vb_space_md"
+                android:paddingEnd="@dimen/vb_space_md"
+                android:paddingTop="@dimen/vb_space_md"
+                android:paddingBottom="@dimen/vb_space_xs"
+                android:textAppearance="@style/TextAppearance.VBoard.Overline"
+                android:text="HÀNH ĐỘNG" />
+
+            <Button
                 android:id="@+id/btnExport"
+                style="@style/Widget.VBoard.Button.Primary"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/button_height_large"
-                android:layout_marginBottom="@dimen/spacing_lg"
-                android:text="@string/backup_export"
-                app:backgroundTint="@color/primary"
-                app:cornerRadius="@dimen/radius_full"
-                app:icon="@android:drawable/ic_menu_save"
-                app:iconGravity="textStart"
-                app:iconTint="@color/on_primary" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/vb_space_md"
+                android:layout_marginEnd="@dimen/vb_space_md"
+                android:text="@string/backup_export" />
 
-            <!-- Import Button -->
-            <com.google.android.material.button.MaterialButton
+            <Space android:layout_width="match_parent" android:layout_height="@dimen/vb_space_xs" />
+
+            <Button
                 android:id="@+id/btnImport"
+                style="@style/Widget.VBoard.Button.Tinted"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/button_height_large"
-                android:layout_marginBottom="@dimen/spacing_xl"
-                android:text="@string/backup_import"
-                app:backgroundTint="@color/secondary_container"
-                app:cornerRadius="@dimen/radius_full"
-                app:icon="@android:drawable/ic_menu_upload"
-                app:iconGravity="textStart"
-                app:iconTint="@color/on_secondary_container" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/vb_space_md"
+                android:layout_marginEnd="@dimen/vb_space_md"
+                android:text="@string/backup_import" />
 
-            <!-- Status message -->
             <TextView
                 android:id="@+id/statusMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="14sp"
+                android:paddingStart="@dimen/vb_space_md"
+                android:paddingEnd="@dimen/vb_space_md"
+                android:paddingTop="@dimen/vb_space_md"
+                android:paddingBottom="@dimen/vb_space_md"
+                android:textAppearance="@style/TextAppearance.VBoard.Caption1"
                 android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
