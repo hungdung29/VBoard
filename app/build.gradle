@@ -15,7 +15,7 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0.0"
-        buildConfigField "boolean", "NEW_DESIGN_SYSTEM", "false"
+        buildConfigField "boolean", "NEW_DESIGN_SYSTEM", "true"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")

@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:name=".VBoardApplication"
-        android:theme="@style/Theme.VBoard">
+        android:theme="@style/Theme.VBoard.New">
 
         <activity
             android:name=".ui.main.MainActivity"
