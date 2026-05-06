@@ -12,4 +12,79 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
     </style>
+
+    <!-- ============================================ -->
+    <!-- VBoard Apple Vibe typography (Phase 1)       -->
+    <!-- 9 TextAppearance styles + 4 component styles  -->
+    <!-- ============================================ -->
+
+    <style name="TextAppearance.VBoard" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textColor">@color/vb_label</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Display">
+        <item name="android:textSize">36sp</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:letterSpacing">-0.038</item>
+        <item name="android:lineHeight">40sp</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Title1">
+        <item name="android:textSize">28sp</item>
+        <item name="android:textFontWeight">700</item>
+        <item name="android:letterSpacing">-0.021</item>
+        <item name="android:lineHeight">32sp</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Title2">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:letterSpacing">-0.018</item>
+        <item name="android:lineHeight">26sp</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Title3">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:letterSpacing">-0.011</item>
+        <item name="android:lineHeight">24sp</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Headline">
+        <item name="android:textSize">17sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:lineHeight">22sp</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Body">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:lineHeight">22sp</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Callout">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:lineHeight">20sp</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Caption1">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textFontWeight">500</item>
+        <item name="android:letterSpacing">0.008</item>
+        <item name="android:lineHeight">16sp</item>
+        <item name="android:textColor">@color/vb_secondary_label</item>
+    </style>
+
+    <style name="TextAppearance.VBoard.Overline">
+        <item name="android:textSize">10sp</item>
+        <item name="android:textFontWeight">600</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/vb_tertiary_label</item>
+    </style>
 </resources>
