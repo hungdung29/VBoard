@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VBoard</string>
+
+    <!-- Main Screen -->
+    <string name="title_communication">Giao Tiếp</string>
+    <string name="placeholder_sentence">Nhấn vào thẻ để ghép câu</string>
+    <string name="btn_speak">PHÁT ÂM</string>
+    <string name="btn_clear">XÓA</string>
+
+    <!-- Categories -->
+    <string name="category_all">Tất cả</string>
+    <string name="category_family">Gia đình</string>
+    <string name="category_food">Ăn uống</string>
+    <string name="category_home">Nhà cửa</string>
+    <string name="category_play">Chơi</string>
+    <string name="category_emotion">Cảm xúc</string>
+    <string name="category_action">Hành động</string>
+    <string name="category_objects">Đồ vật</string>
+    <string name="category_places">Nơi chốn</string>
+
+    <!-- PIN Screen -->
+    <string name="pin_title">Nhập mã PIN</string>
+    <string name="pin_subtitle">Mở khóa chế độ dành cho phụ huynh</string>
+    <string name="pin_cancel">Hủy</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Cài đặt hệ thống</string>
+    <string name="settings_ui">Giao diện</string>
+    <string name="settings_ui_desc">Tùy chỉnh độ sáng, lưới màn hình</string>
+    <string name="settings_voice">Giọng đọc</string>
+    <string name="settings_voice_desc">Âm lượng, thêm giọng nói cá nhân</string>
+    <string name="settings_vocab">Bảng từ vựng</string>
+    <string name="settings_vocab_desc">Quản lý, chỉnh sửa kho thẻ</string>
+    <string name="settings_stats">Thống kê sử dụng</string>
+    <string name="settings_stats_desc">Lịch sử giao tiếp của người dùng</string>
+
+    <!-- UI Settings -->
+    <string name="ui_settings_title">Cài đặt Giao diện</string>
+    <string name="ui_theme">Chủ đề</string>
+    <string name="ui_light">Sáng</string>
+    <string name="ui_dark">Tối</string>
+    <string name="ui_grid_columns">Cột lưới từ vựng</string>
+    <string name="ui_text_labels">Nhãn văn bản</string>
+    <string name="ui_text_labels_desc">Hiển thị tên chữ dưới biểu tượng</string>
+
+    <!-- Voice Settings -->
+    <string name="voice_settings_title">Giọng đọc</string>
+    <string name="voice_preview">Nghe thử</string>
+    <string name="voice_volume">Âm lượng</string>
+    <string name="voice_type">Kiểu Giọng</string>
+    <string name="voice_clone">Ghi âm giọng nói bố mẹ</string>
+    <string name="voice_clone_info">Sử dụng giọng nói quen thuộc của người thân giúp trẻ cảm thấy an tâm và tăng khả năng tương tác thông qua ứng dụng AAC.</string>
+
+    <!-- Edit Mode -->
+    <string name="edit_title">Chế độ chỉnh sửa</string>
+    <string name="edit_add_card">Thêm thẻ mới</string>
+    <string name="edit_word_name">Tên từ</string>
+    <string name="edit_category">Chủ đề</string>
+    <string name="edit_upload_image">Tải ảnh lên</string>
+
+    <!-- Stats -->
+    <string name="stats_title">Thống kê sử dụng</string>
+    <string name="stats_welcome">Chào ba mẹ,</string>
+    <string name="stats_today_progress">Tiến độ của bé hôm nay</string>
+    <string name="stats_sentences_created">CÂU ĐÃ GHÉP</string>
+    <string name="stats_unique_words">TỪ MỚI DÙNG</string>
+    <string name="stats_analysis">PHÂN TÍCH</string>
+    <string name="stats_top_words">Từ được dùng nhiều nhất</string>
+    <string name="stats_7_days">7 ngày qua</string>
+
+    <!-- Actions -->
+    <string name="action_cancel">Hủy</string>
+    <string name="action_add">Thêm</string>
+    <string name="action_save">Lưu</string>
+    <string name="action_delete">Xóa</string>
+    <string name="action_done">Xong</string>
+    <string name="action_close">Đóng</string>
+
+    <!-- Backup / Restore -->
+    <string name="backup_restore_title">Sao lưu</string>
+    <string name="backup_restore_desc">Xuất/Nhập kho từ vựng qua file JSON</string>
+    <string name="backup_export">Xuất file sao lưu</string>
+    <string name="backup_import">Nhập từ file</string>
+    <string name="backup_success">Đã xuất sao lưu thành công</string>
+    <string name="backup_import_success">Đã nhập %1$d thư mục, %2$d thẻ</string>
+    <string name="backup_error">Lỗi: %1$s</string>
+    <string name="confirm_delete_title">Xác nhận xóa</string>
+    <string name="confirm_delete_message">Bạn có chắc muốn xóa thẻ này?</string>
+    <string name="confirm_delete_yes">Đồng ý</string>
+
+    <!-- Add Card -->
+    <string name="add_card_title">Thêm thẻ mới</string>
+    <string name="add_card_tap_image">Chạm để chụp ảnh</string>
+
+    <!-- Folder -->
+    <string name="add_folder_title">Tạo thư mục mới</string>
+    <string name="folder_name_hint">Tên thư mục</string>
+</resources>

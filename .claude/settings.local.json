@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"D:\\\\UI\\\\Project\\\\stitch_vboard_aac_mobile\" -Force -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object Name, Mode)",
+      "Read(//mnt/d/UI/Project/**)",
+      "Read(//d/UI/Project/stitch_vboard_aac_mobile/**)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(java *)",
+      "Bash(./gradlew clean *)",
+      "Bash(./gradlew assembleDebug --stacktrace)",
+      "Bash(./gradlew --version)",
+      "Bash(./gradlew compileDebugKotlin)"
+    ]
+  }
+}

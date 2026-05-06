@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="@color/surface_container_low"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_lg">
+
+        <TextView
+            android:id="@+id/btnCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing_md"
+            android:text="Hủy"
+            android:textColor="@color/error"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/edit_title"
+            android:textColor="@color/on_surface"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btnDone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing_md"
+            android:text="@string/action_done"
+            android:textColor="@color/primary"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Folder Tabs -->
+    <HorizontalScrollView
+        android:id="@+id/folderScroll"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="64dp"
+        android:background="@color/surface"
+        android:paddingHorizontal="@dimen/spacing_lg"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/folderContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="120dp"
+        android:background="@color/outline_variant" />
+
+    <!-- Card Grid -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/vocabGrid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="121dp"
+        android:clipToPadding="false"
+        android:padding="@dimen/spacing_lg"
+        android:paddingBottom="96dp" />
+
+    <!-- FAB: Add Folder -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddFolder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/spacing_lg"
+        android:layout_marginBottom="96dp"
+        android:contentDescription="Thêm thư mục"
+        android:src="@android:drawable/ic_menu_add"
+        app:backgroundTint="@color/secondary_container"
+        app:fabSize="normal"
+        app:tint="@color/on_secondary_container" />
+
+    <!-- FAB: Add Card -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="@dimen/spacing_lg"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="Thêm thẻ mới"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/primary"
+        app:fabSize="normal"
+        app:tint="@color/on_primary" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

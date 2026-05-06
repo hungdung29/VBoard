@@ -1,0 +1,92 @@
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (Android SDK path, etc.)
+local.properties
+
+# IntelliJ
+*.iml
+.idea/
+*.ipr
+*.iws
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.idea/deviceManager.xml
+.idea/deploymentTargetSelector.xml
+.idea/AndroidProjectSystem.xml
+.idea/planningMode.xml
+.idea/runConfigurations.xml
+.idea/markdown.xml
+.idea/migrations.xml
+.idea/caches/deviceStreaming.xml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Android Studio — captures folder
+captures/
+
+# Android Studio — lint cache
+.lint/
+
+# Android Studio — Inspection tool cache
+.inspect/
+
+# Android Studio — generated file (merges dictionaries)
+dictionary.txt
+
+# Android Studio — built reports
+build/reports/
+build/outputs/
+
+# VS Code
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# CVS
+.cvsignore
+
+# Bitbucket
+**/pings-index.xml
+**/owners-hash.xml
+
+# Mac
+.DS_Store
+
+# Backup files
+*.bak
+*.swp
+*~
+
+# Logs
+*.log
+
+# Local configuration (contains keystore path, passwords, etc.)
+gradle.properties.local

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/spacing_xs">
+
+    <!-- Main Card -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/editCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardBackgroundColor="@color/surface_container_lowest"
+        app:cardCornerRadius="@dimen/radius_xl"
+        app:cardElevation="0dp">
+
+        <!-- Use ConstraintLayout for proper aspect ratio -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/spacing_sm">
+
+            <!-- Aspect Ratio Container (square) -->
+            <View
+                android:id="@+id/aspectRatio"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- Image Container -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@drawable/bg_emoji_container"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toTopOf="@id/wordText"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/emojiText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📝"
+                    android:textSize="36sp" />
+            </LinearLayout>
+
+            <!-- Word Label -->
+            <TextView
+                android:id="@+id/wordText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingVertical="@dimen/spacing_xs"
+                android:text="Từ"
+                android:textColor="@color/on_surface"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- Edit Button -->
+            <LinearLayout
+                android:id="@+id/btnEdit"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_margin="@dimen/spacing_xs"
+                android:background="@drawable/bg_icon_primary"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="@id/emojiText"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:tint="@color/on_primary_container" />
+            </LinearLayout>
+
+            <!-- Delete Button -->
+            <LinearLayout
+                android:id="@+id/btnDelete"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_margin="@dimen/spacing_xs"
+                android:background="@drawable/bg_icon_error"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_close_clear_cancel"
+                    app:tint="@color/error" />
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

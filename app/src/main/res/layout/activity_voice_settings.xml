@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_md"
+        android:paddingVertical="@dimen/spacing_md">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Quay lại"
+            android:src="@android:drawable/ic_menu_revert" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/voice_settings_title"
+            android:textColor="@color/primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="48dp"
+            android:layout_height="48dp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/spacing_lg">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Preview Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPreview"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/button_height_large"
+                android:layout_marginBottom="@dimen/spacing_lg"
+                android:text="@string/voice_preview"
+                app:backgroundTint="@color/secondary_container"
+                app:cornerRadius="@dimen/radius_full"
+                app:icon="@android:drawable/ic_media_play"
+                app:iconGravity="textStart"
+                app:iconTint="@color/on_secondary_container" />
+
+            <!-- Volume -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:text="@string/voice_volume"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_xl"
+                android:background="@drawable/bg_settings_card"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_lg">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@android:drawable/ic_lock_silent_mode_off" />
+
+                <SeekBar
+                    android:id="@+id/volumeSlider"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/spacing_md"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="100" />
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@android:drawable/ic_lock_silent_mode_off" />
+            </LinearLayout>
+
+            <!-- Voice Type -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_md"
+                android:text="@string/voice_type"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/voiceTypeGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/spacing_xl"
+                android:background="@drawable/bg_settings_card"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_lg">
+
+                <RadioButton
+                    android:id="@+id/radioMaleNorth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_sm"
+                    android:text="Nam miền Bắc"
+                    android:textColor="@color/on_surface"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/radioMaleSouth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_sm"
+                    android:text="Nam miền Nam"
+                    android:textColor="@color/on_surface"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/radioFemaleNorth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_sm"
+                    android:text="Nữ miền Bắc"
+                    android:textColor="@color/on_surface"
+                    android:textSize="16sp" />
+
+                <RadioButton
+                    android:id="@+id/radioFemaleSouth"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_sm"
+                    android:text="Nữ miền Nam"
+                    android:textColor="@color/on_surface"
+                    android:textSize="16sp" />
+            </RadioGroup>
+
+            <!-- Voice Clone Button (Future) -->
+            <LinearLayout
+                android:id="@+id/btnVoiceClone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="0.5"
+                android:background="@drawable/bg_button_gradient"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:padding="@dimen/spacing_xl">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_btn_speak_now" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/spacing_md"
+                    android:text="@string/voice_clone"
+                    android:textColor="@color/on_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
