@@ -52,4 +52,46 @@
     <color name="dark_surface">#1a1c1b</color>
     <color name="dark_surface_container_lowest">#2f3130</color>
     <color name="dark_on_surface">#e3e2e0</color>
+
+    <!-- ============================================== -->
+    <!-- VBoard Apple Vibe tokens (Phase 1 introduction) -->
+    <!-- All tokens prefixed with `vb_` to coexist with  -->
+    <!-- legacy tokens until Phase 4.                    -->
+    <!-- ============================================== -->
+
+    <!-- Surfaces (3-tier) -->
+    <color name="vb_system_background">#F2F2F7</color>
+    <color name="vb_secondary_system_background">#FFFFFF</color>
+    <color name="vb_tertiary_system_background">#F2F2F7</color>
+
+    <!-- Label & Separator (alpha encoded as AARRGGBB) -->
+    <color name="vb_label">#1C1C1E</color>
+    <color name="vb_secondary_label">#993C3C43</color>
+    <color name="vb_tertiary_label">#4D3C3C43</color>
+    <color name="vb_placeholder">#383C3C43</color>
+    <color name="vb_separator">#E5E5EA</color>
+    <color name="vb_opaque_separator">#C6C6C8</color>
+
+    <!-- Accent & Semantic -->
+    <color name="vb_accent">#007AFF</color>
+    <color name="vb_accent_tinted">#1F007AFF</color>
+    <color name="vb_success">#34C759</color>
+    <color name="vb_warning">#FF9500</color>
+    <color name="vb_error">#FF3B30</color>
+    <color name="vb_info">#5856D6</color>
+    <color name="vb_disabled">#8E8E93</color>
+
+    <!-- Category tints — bg + label per category -->
+    <color name="vb_category_food_bg">#FFF3E0</color>
+    <color name="vb_category_food_label">#9A4E00</color>
+    <color name="vb_category_family_bg">#E8F4FF</color>
+    <color name="vb_category_family_label">#0050C7</color>
+    <color name="vb_category_emotion_bg">#FFE8EE</color>
+    <color name="vb_category_emotion_label">#A0144F</color>
+    <color name="vb_category_activity_bg">#E8F8E9</color>
+    <color name="vb_category_activity_label">#1B5E20</color>
+    <color name="vb_category_object_bg">#F0E7FF</color>
+    <color name="vb_category_object_label">#4A148C</color>
+    <color name="vb_category_place_bg">#FFF8DC</color>
+    <color name="vb_category_place_label">#8B6914</color>
 </resources>

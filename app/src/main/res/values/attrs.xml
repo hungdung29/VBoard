@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Custom attributes consumed by VBoardCardView (Phase 2) and adapter logic. -->
+    <declare-styleable name="VBoardCardView">
+        <attr name="vbCategory" format="enum">
+            <enum name="none"     value="0" />
+            <enum name="food"     value="1" />
+            <enum name="family"   value="2" />
+            <enum name="emotion"  value="3" />
+            <enum name="activity" value="4" />
+            <enum name="object"   value="5" />
+            <enum name="place"    value="6" />
+        </attr>
+    </declare-styleable>
+</resources>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- VBoard Apple Vibe tokens — DARK -->
+
+    <!-- Surfaces (3-tier) -->
+    <color name="vb_system_background">#000000</color>
+    <color name="vb_secondary_system_background">#1C1C1E</color>
+    <color name="vb_tertiary_system_background">#2C2C2E</color>
+
+    <!-- Label & Separator -->
+    <color name="vb_label">#FFFFFF</color>
+    <color name="vb_secondary_label">#99EBEBF5</color>
+    <color name="vb_tertiary_label">#4DEBEBF5</color>
+    <color name="vb_placeholder">#38EBEBF5</color>
+    <color name="vb_separator">#38383A</color>
+    <color name="vb_opaque_separator">#545458</color>
+
+    <!-- Accent & Semantic -->
+    <color name="vb_accent">#0A84FF</color>
+    <color name="vb_accent_tinted">#1F0A84FF</color>
+    <color name="vb_success">#30D158</color>
+    <color name="vb_warning">#FF9F0A</color>
+    <color name="vb_error">#FF453A</color>
+    <color name="vb_info">#5E5CE6</color>
+    <color name="vb_disabled">#8E8E93</color>
+
+    <!-- Category tints (dark variants) -->
+    <color name="vb_category_food_bg">#3A2A14</color>
+    <color name="vb_category_food_label">#FFD8A8</color>
+    <color name="vb_category_family_bg">#102A45</color>
+    <color name="vb_category_family_label">#A6CFFF</color>
+    <color name="vb_category_emotion_bg">#3A1A24</color>
+    <color name="vb_category_emotion_label">#FFB3C8</color>
+    <color name="vb_category_activity_bg">#13301A</color>
+    <color name="vb_category_activity_label">#A8E6B0</color>
+    <color name="vb_category_object_bg">#251A40</color>
+    <color name="vb_category_object_label">#D0B8FF</color>
+    <color name="vb_category_place_bg">#322B14</color>
+    <color name="vb_category_place_label">#FFE08A</color>
+</resources>
