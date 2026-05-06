@@ -40,4 +40,38 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
+    <!-- ============================================ -->
+    <!-- Theme.VBoard.New — Apple Vibe (Phase 1)      -->
+    <!-- Applied conditionally via BuildConfig flag.   -->
+    <!-- ============================================ -->
+    <style name="Theme.VBoard.New" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Material3 ColorScheme mapped to vb_* tokens -->
+        <item name="colorPrimary">@color/vb_accent</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">@color/vb_accent_tinted</item>
+        <item name="colorOnPrimaryContainer">@color/vb_accent</item>
+
+        <item name="colorSecondary">@color/vb_accent</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+
+        <item name="colorTertiary">@color/vb_info</item>
+        <item name="colorError">@color/vb_error</item>
+        <item name="colorOnError">#FFFFFF</item>
+
+        <item name="android:colorBackground">@color/vb_system_background</item>
+        <item name="colorSurface">@color/vb_secondary_system_background</item>
+        <item name="colorOnSurface">@color/vb_label</item>
+        <item name="colorOnSurfaceVariant">@color/vb_secondary_label</item>
+        <item name="colorOutline">@color/vb_separator</item>
+        <item name="colorOutlineVariant">@color/vb_separator</item>
+
+        <!-- Default text appearance -->
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textAppearance">@style/TextAppearance.VBoard.Body</item>
+
+        <!-- Status bar matches background -->
+        <item name="android:statusBarColor">@color/vb_system_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
 </resources>
