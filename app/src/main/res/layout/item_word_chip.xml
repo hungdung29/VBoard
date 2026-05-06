@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/wordChip"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/spacing_sm"
-    android:background="@drawable/bg_word_chip"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/spacing_lg"
-    android:paddingVertical="@dimen/spacing_sm">
+    android:layout_marginEnd="@dimen/vb_space_xs"
+    android:background="@drawable/vb_bg_chip_word"
+    android:paddingStart="@dimen/vb_space_sm"
+    android:paddingEnd="@dimen/vb_space_sm"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/wordText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Từ"
-        android:textColor="@color/on_primary_container"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-</LinearLayout>
+        android:textAppearance="@style/TextAppearance.VBoard.Callout"
+        android:textColor="@color/vb_accent"
+        android:textFontWeight="600"
+        tools:text="Con" />
+</FrameLayout>

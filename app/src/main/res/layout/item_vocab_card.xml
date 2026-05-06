@@ -1,58 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.vboard.aac.ui.common.VBoardCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/vocabCard"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/surface_container_lowest"
-    app:cardCornerRadius="@dimen/radius_xl"
-    app:cardElevation="0dp">
+    android:layout_height="0dp"
+    android:layout_margin="@dimen/vb_space_2xs"
+    android:minHeight="48dp"
+    app:layout_constraintDimensionRatio="1:1"
+    app:cardBackgroundColor="@color/vb_secondary_system_background"
+    app:cardCornerRadius="@dimen/vb_radius_md"
+    app:cardElevation="@dimen/vb_elevation_e1">
 
-    <!-- Use ConstraintLayout for proper aspect ratio -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:paddingStart="@dimen/vb_space_sm"
+        android:paddingEnd="@dimen/vb_space_sm">
 
-        <!-- Aspect Ratio Container (2:3 ratio like Stitch design) -->
-        <View
-            android:id="@+id/aspectRatio"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintDimensionRatio="3:4"
-            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/emojiText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="36sp"
+            tools:text="🍚" />
 
-        <!-- Image/Emoji Container -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@drawable/bg_emoji_container"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/spacing_md"
-            app:layout_constraintBottom_toTopOf="@id/wordLabel"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/emojiText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📝"
-                android:textSize="48sp" />
-        </LinearLayout>
-
-        <!-- Word Label -->
         <TextView
             android:id="@+id/wordLabel"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:maxLines="2"
-            android:padding="@dimen/spacing_sm"
-            android:text="Từ"
-            android:textColor="@color/on_surface"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aspectRatio" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+            android:layout_marginTop="@dimen/vb_space_2xs"
+            android:textAppearance="@style/TextAppearance.VBoard.Callout"
+            android:textColor="@color/vb_label"
+            tools:text="Cơm" />
+    </LinearLayout>
+</com.vboard.aac.ui.common.VBoardCardView>

@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chipContainer"
     android:layout_width="wrap_content"
-    android:layout_height="40dp"
-    android:layout_marginEnd="@dimen/spacing_sm"
-    android:background="@drawable/bg_category_chip"
-    android:gravity="center_vertical"
+    android:layout_height="@dimen/vb_chip_height"
+    android:layout_marginEnd="@dimen/vb_space_xs"
     android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/spacing_md">
+    android:gravity="center_vertical"
+    android:background="@drawable/vb_bg_chip_category"
+    android:paddingStart="@dimen/vb_space_sm"
+    android:paddingEnd="@dimen/vb_space_sm"
+    android:clickable="true"
+    android:focusable="true">
 
     <TextView
         android:id="@+id/chipIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="📋"
-        android:textSize="16sp" />
+        android:layout_marginEnd="@dimen/vb_space_2xs"
+        android:textSize="14sp"
+        tools:text="🍴" />
 
     <TextView
         android:id="@+id/chipText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/spacing_xs"
-        android:text="Tất cả"
-        android:textColor="@color/on_surface_variant"
-        android:textSize="12sp"
-        android:textStyle="bold" />
+        android:textAppearance="@style/TextAppearance.VBoard.Callout"
+        android:textColor="@color/vb_label"
+        tools:text="Ăn uống" />
 </LinearLayout>
