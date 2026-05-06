@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    app:cardBackgroundColor="@color/vb_secondary_system_background"
+    app:cardCornerRadius="@dimen/vb_radius_md"
+    app:cardElevation="@dimen/vb_elevation_e1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/vb_space_md">
+
+        <TextView
+            android:id="@+id/vb_tile_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.VBoard.Display"
+            tools:text="12" />
+
+        <TextView
+            android:id="@+id/vb_tile_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vb_space_2xs"
+            android:textAppearance="@style/TextAppearance.VBoard.Caption1"
+            tools:text="Số câu hôm nay" />
+
+        <TextView
+            android:id="@+id/vb_tile_delta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vb_space_xs"
+            android:textAppearance="@style/TextAppearance.VBoard.Caption1"
+            android:textColor="@color/vb_success"
+            android:textFontWeight="600"
+            android:visibility="gone"
+            tools:text="↑ 3 hôm qua"
+            tools:visibility="visible" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

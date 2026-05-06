@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/vb_listrow_min_height"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="@dimen/vb_space_md"
+    android:paddingEnd="@dimen/vb_space_md"
+    android:paddingTop="14dp"
+    android:paddingBottom="14dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <FrameLayout
+        android:id="@+id/vb_row_icon_container"
+        android:layout_width="@dimen/vb_listrow_icon"
+        android:layout_height="@dimen/vb_listrow_icon"
+        android:background="@drawable/vb_bg_listrow_icon"
+        android:layout_marginEnd="@dimen/vb_space_md">
+
+        <TextView
+            android:id="@+id/vb_row_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.VBoard.Headline"
+            android:textColor="@color/vb_accent"
+            tools:text="🔤" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/vb_row_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.VBoard.Body"
+            android:textFontWeight="500"
+            tools:text="Quản lý từ vựng" />
+
+        <TextView
+            android:id="@+id/vb_row_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.VBoard.Caption1"
+            android:visibility="gone"
+            tools:text="120 thẻ · 6 nhóm"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/vb_row_trailing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.VBoard.Body"
+        android:textColor="@color/vb_tertiary_label"
+        android:text="›" />
+</LinearLayout>

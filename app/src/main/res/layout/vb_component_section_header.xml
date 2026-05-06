@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/vb_space_md"
+    android:paddingEnd="@dimen/vb_space_md"
+    android:paddingTop="@dimen/vb_space_md"
+    android:paddingBottom="@dimen/vb_space_xs">
+
+    <TextView
+        android:id="@+id/vb_section_eyebrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextAppearance.VBoard.Overline"
+        tools:text="HÔM NAY" />
+
+    <TextView
+        android:id="@+id/vb_section_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textAppearance="@style/TextAppearance.VBoard.Title3"
+        android:visibility="gone"
+        tools:text="Số câu đã ghép"
+        tools:visibility="visible" />
+</LinearLayout>

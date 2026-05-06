@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/vb_space_md"
+    app:cardBackgroundColor="@color/vb_secondary_system_background"
+    app:cardCornerRadius="@dimen/vb_radius_md"
+    app:cardElevation="@dimen/vb_elevation_e1">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="@dimen/vb_space_sm">
+
+        <HorizontalScrollView
+            android:id="@+id/vb_strip_scroll"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:id="@+id/vb_strip_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/vb_strip_placeholder"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="@style/TextAppearance.VBoard.Body"
+            android:textStyle="italic"
+            android:textColor="@color/vb_placeholder"
+            android:visibility="gone"
+            tools:text="Chạm vào thẻ để ghép câu…"
+            tools:visibility="visible" />
+
+        <ImageButton
+            android:id="@+id/vb_strip_backspace"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginStart="@dimen/vb_space_xs"
+            android:background="@drawable/vb_bg_card_neutral"
+            android:scaleType="centerInside"
+            android:src="@drawable/vb_ic_backspace"
+            android:contentDescription="Xoá từ cuối" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
