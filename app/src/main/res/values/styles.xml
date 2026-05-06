@@ -87,4 +87,66 @@
         <item name="android:textAllCaps">true</item>
         <item name="android:textColor">@color/vb_tertiary_label</item>
     </style>
+
+    <!-- ============================================ -->
+    <!-- VBoard component styles (Phase 2)            -->
+    <!-- ============================================ -->
+
+    <!-- Buttons -->
+    <style name="Widget.VBoard.Button" parent="Widget.Material3.Button">
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textAppearance">@style/TextAppearance.VBoard.Headline</item>
+        <item name="android:minHeight">@dimen/vb_button_height</item>
+        <item name="android:paddingStart">@dimen/vb_space_xl</item>
+        <item name="android:paddingEnd">@dimen/vb_space_xl</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.VBoard.Button.Primary">
+        <item name="android:background">@drawable/vb_bg_btn_primary</item>
+        <item name="android:textColor">@color/vb_btn_primary_text</item>
+    </style>
+
+    <style name="Widget.VBoard.Button.Danger">
+        <item name="android:background">@drawable/vb_bg_btn_danger</item>
+        <item name="android:textColor">@color/vb_btn_danger_text</item>
+    </style>
+
+    <style name="Widget.VBoard.Button.Tinted">
+        <item name="android:background">@drawable/vb_bg_btn_tinted</item>
+        <item name="android:textColor">@color/vb_accent</item>
+    </style>
+
+    <style name="Widget.VBoard.Button.Plain" parent="Widget.Material3.Button.TextButton">
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textAppearance">@style/TextAppearance.VBoard.Body</item>
+        <item name="android:textColor">@color/vb_accent</item>
+        <item name="android:minHeight">44dp</item>
+        <item name="android:paddingStart">@dimen/vb_space_sm</item>
+        <item name="android:paddingEnd">@dimen/vb_space_sm</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <!-- Numpad -->
+    <style name="Widget.VBoard.NumpadButton" parent="android:Widget">
+        <item name="android:layout_width">@dimen/vb_numpad_size</item>
+        <item name="android:layout_height">@dimen/vb_numpad_size</item>
+        <item name="android:layout_margin">5dp</item>
+        <item name="android:background">@drawable/vb_bg_numpad_button</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:textAppearance">@style/TextAppearance.VBoard.Title2</item>
+        <item name="android:textColor">@color/vb_label</item>
+        <item name="android:textFontWeight">400</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.VBoard.NumpadButton.Plain">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:textColor">@color/vb_accent</item>
+        <item name="android:textAppearance">@style/TextAppearance.VBoard.Body</item>
+        <item name="android:textFontWeight">500</item>
+    </style>
 </resources>
