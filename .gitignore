@@ -85,6 +85,9 @@ build/outputs/
 *.swp
 *~
 
+# Superpowers brainstorming session files
+.superpowers/
+
 # Logs
 *.log
 
