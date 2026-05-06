@@ -12,39 +12,34 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/vb_topappbar_height"
         android:background="@color/vb_secondary_system_background">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingStart="@dimen/vb_space_sm"
-            android:paddingEnd="@dimen/vb_space_sm">
-
+            android:paddingStart="@dimen/vb_space_lg"
+            android:paddingEnd="@dimen/vb_space_lg">
             <ImageButton
                 android:id="@+id/btnSettings"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="?android:attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Cài đặt"
                 android:src="@drawable/vb_ic_settings"
                 app:tint="@color/vb_label" />
-
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/app_name"
-                android:textAppearance="@style/TextAppearance.VBoard.Headline"
+                android:textAppearance="@style/TextAppearance.VBoard.Title3"
                 android:textColor="@color/vb_label" />
-
             <View
                 android:id="@+id/avatar"
-                android:layout_width="44dp"
-                android:layout_height="44dp" />
+                android:layout_width="48dp"
+                android:layout_height="48dp" />
         </LinearLayout>
-
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/vb_hairline"
@@ -52,31 +47,28 @@
             android:background="@color/vb_separator" />
     </FrameLayout>
 
-    <!-- Sentence Strip -->
+    <!-- Sentence Strip — taller on tablet -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/sentenceCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/vb_space_md"
+        android:layout_margin="@dimen/vb_space_lg"
         app:cardBackgroundColor="@color/vb_secondary_system_background"
         app:cardCornerRadius="@dimen/vb_radius_md"
         app:cardElevation="@dimen/vb_elevation_e1">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="56dp"
+            android:minHeight="64dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:padding="@dimen/vb_space_sm">
-
+            android:padding="@dimen/vb_space_md">
             <HorizontalScrollView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:scrollbars="none"
                 android:fillViewport="true">
-
                 <LinearLayout
                     android:id="@+id/wordsContainer"
                     android:layout_width="wrap_content"
@@ -84,7 +76,6 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical" />
             </HorizontalScrollView>
-
             <TextView
                 android:id="@+id/placeholder"
                 android:layout_width="0dp"
@@ -94,12 +85,11 @@
                 android:textStyle="italic"
                 android:textColor="@color/vb_placeholder"
                 android:text="@string/placeholder_sentence" />
-
             <ImageButton
                 android:id="@+id/btnBackspace"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="@dimen/vb_space_xs"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="@dimen/vb_space_sm"
                 android:background="@drawable/vb_bg_card_neutral"
                 android:scaleType="centerInside"
                 android:src="@drawable/vb_ic_backspace"
@@ -114,11 +104,10 @@
         android:layout_height="wrap_content"
         android:background="@color/vb_secondary_system_background"
         android:scrollbars="none"
-        android:paddingStart="@dimen/vb_space_md"
-        android:paddingEnd="@dimen/vb_space_md"
+        android:paddingStart="@dimen/vb_space_lg"
+        android:paddingEnd="@dimen/vb_space_lg"
         android:paddingTop="@dimen/vb_space_xs"
         android:paddingBottom="@dimen/vb_space_xs">
-
         <LinearLayout
             android:id="@+id/categoryContainer"
             android:layout_width="wrap_content"
@@ -132,45 +121,41 @@
         android:layout_height="@dimen/vb_hairline"
         android:background="@color/vb_separator" />
 
-    <!-- Vocabulary Grid -->
+    <!-- Vocabulary Grid: 5 columns sw600dp -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/vocabGrid"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="@dimen/vb_space_xs"
+        android:padding="@dimen/vb_space_sm"
         android:clipToPadding="false"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="@integer/vb_board_columns" />
 
-    <!-- Bottom Action Bar -->
+    <!-- Bottom Action Bar — speak takes 3:1 weight on tablet -->
     <FrameLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/vb_secondary_system_background">
-
         <View
             android:layout_width="match_parent"
             android:layout_height="@dimen/vb_hairline"
             android:background="@color/vb_separator" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="@dimen/vb_space_md"
+            android:padding="@dimen/vb_space_lg"
             android:gravity="center_vertical">
-
             <Button
                 android:id="@+id/btnSpeakBottom"
                 style="@style/Widget.VBoard.Button.Primary"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:layout_marginEnd="@dimen/vb_space_xs"
+                android:layout_weight="3"
+                android:layout_marginEnd="@dimen/vb_space_sm"
                 android:text="@string/btn_speak" />
-
             <Button
                 android:id="@+id/btnClear"
                 style="@style/Widget.VBoard.Button.Danger"

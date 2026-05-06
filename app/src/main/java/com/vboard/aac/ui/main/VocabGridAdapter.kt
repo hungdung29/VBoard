@@ -1,27 +1,31 @@
 package com.vboard.aac.ui.main
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.vboard.aac.databinding.ItemVocabCardBinding
-import com.vboard.aac.domain.model.VocabCard
+import com.vboard.aac.ui.common.CategoryTinter
 
 class VocabGridAdapter(
-    private val onCardClick: (VocabCard) -> Unit
-) : ListAdapter<VocabCard, VocabGridAdapter.VocabViewHolder>(VocabDiffCallback()) {
+    private val onCardClick: (VocabCardUiItem) -> Unit,
+) : ListAdapter<VocabCardUiItem, VocabGridAdapter.VocabViewHolder>(DiffCallback()) {
 
     private var showLabels = true
 
     fun setShowLabels(show: Boolean) {
+        if (showLabels == show) return
         showLabels = show
         notifyItemRangeChanged(0, itemCount)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VocabViewHolder {
         val binding = ItemVocabCardBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false
+            LayoutInflater.from(parent.context), parent, false,
         )
         return VocabViewHolder(binding)
     }
@@ -31,59 +35,36 @@ class VocabGridAdapter(
     }
 
     inner class VocabViewHolder(
-        private val binding: ItemVocabCardBinding
+        private val binding: ItemVocabCardBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         init {
             binding.vocabCard.setOnClickListener {
                 val pos = bindingAdapterPosition
-                if (pos != RecyclerView.NO_POSITION) {
-                    onCardClick(getItem(pos))
-                }
+                if (pos != RecyclerView.NO_POSITION) onCardClick(getItem(pos))
             }
         }
 
-        fun bind(card: VocabCard) {
-            binding.wordLabel.text = card.word
-            binding.wordLabel.visibility = if (showLabels) {
-                android.view.View.VISIBLE
-            } else {
-                android.view.View.GONE
-            }
+        fun bind(item: VocabCardUiItem) {
+            val ctx = binding.root.context
+            val (bgRes, labelRes) = CategoryTinter.colorsFor(item.categoryCode)
 
-            // Emoji fallback map
-            val emoji = EMOJI_MAP[card.word] ?: "📝"
-            binding.emojiText.text = emoji
+            binding.vocabCard.setCategoryCode(item.categoryCode)
+            binding.vocabCard.backgroundTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(ctx, bgRes),
+            )
+
+            binding.emojiText.text = item.emoji
+            binding.wordLabel.text = item.word
+            binding.wordLabel.setTextColor(ContextCompat.getColor(ctx, labelRes))
+            binding.wordLabel.visibility = if (showLabels) View.VISIBLE else View.GONE
         }
     }
 
-    class VocabDiffCallback : DiffUtil.ItemCallback<VocabCard>() {
-        override fun areItemsTheSame(oldItem: VocabCard, newItem: VocabCard) =
+    class DiffCallback : DiffUtil.ItemCallback<VocabCardUiItem>() {
+        override fun areItemsTheSame(oldItem: VocabCardUiItem, newItem: VocabCardUiItem) =
             oldItem.id == newItem.id
-
-        override fun areContentsTheSame(oldItem: VocabCard, newItem: VocabCard) =
+        override fun areContentsTheSame(oldItem: VocabCardUiItem, newItem: VocabCardUiItem) =
             oldItem == newItem
-    }
-
-    companion object {
-        val EMOJI_MAP = mapOf(
-            "Mẹ" to "👩", "Ba" to "👨", "Em" to "👧", "Ông" to "👴", "Bà" to "👵",
-            "Con" to "👶", "Anh" to "🧑", "Chị" to "👩‍🦱",
-            "Nước" to "💧", "Cơm" to "🍚", "Bánh" to "🍰", "Sữa" to "🥛",
-            "Trái cây" to "🍎", "Thịt" to "🥩", "Cá" to "🐟", "Rau" to "🥬",
-            "Trà" to "🍵", "Bánh mì" to "🥖",
-            "Nhà" to "🏠", "Phòng" to "🚪", "Giường" to "🛏️", "Cửa" to "🚪",
-            "Cửa sổ" to "🪟", "Bếp" to "🍳", "Tivi" to "📺",
-            "Chơi" to "🎮", "Đồ chơi" to "🧸", "Bóng" to "⚽", "Sách" to "📖",
-            "Đi dạo" to "🚶", "Bơi" to "🏊", "Nhảy" to "🕺", "Hát" to "🎵",
-            "Vui" to "😊", "Buồn" to "😢", "Sợ" to "😨", "Mệt" to "😫",
-            "Đói" to "😫", "Khát" to "🥤", "Nóng" to "🔥", "Lạnh" to "❄️",
-            "Muốn" to "💭", "Cần" to "✋", "Đi" to "🚶", "Ngủ" to "😴",
-            "Tắm" to "🚿", "Mặc" to "👕", "Đi học" to "🏫", "Xem" to "👀",
-            "Bút" to "✏️", "Giấy" to "📄", "Bảng" to "📋",
-            "Điện thoại" to "📱", "Máy tính" to "💻", "Ô tô" to "🚗",
-            "Trường" to "🏫", "Bệnh viện" to "🏥", "Công viên" to "🌳",
-            "Siêu thị" to "🛒", "Biển" to "🌊"
-        )
     }
 }

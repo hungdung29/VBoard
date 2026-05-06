@@ -18,6 +18,7 @@ import com.vboard.aac.databinding.ItemWordChipBinding
 import com.vboard.aac.domain.model.Category
 import com.vboard.aac.domain.model.SentenceItem
 import com.vboard.aac.platform.feedback.HapticFeedbackManager
+import com.vboard.aac.ui.common.CategoryTinter
 import com.vboard.aac.ui.pin.PinActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -46,25 +47,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupAdapters() {
-        vocabAdapter = VocabGridAdapter { card ->
+        vocabAdapter = VocabGridAdapter { item ->
             hapticManager.tap()
-            viewModel.addWordToSentence(card)
+            viewModel.addWordToSentence(item)
         }
 
-        binding.vocabGrid.layoutManager = GridLayoutManager(this, 3)
+        val initialColumns = resources.getInteger(R.integer.vb_board_columns)
+        binding.vocabGrid.layoutManager = GridLayoutManager(this, initialColumns)
         binding.vocabGrid.adapter = vocabAdapter
     }
 
     private fun setupListeners() {
-        binding.btnSpeakBottom.setOnClickListener {
-            viewModel.speakSentence()
-        }
-        binding.btnClear.setOnClickListener {
-            viewModel.clearSentence()
-        }
-        binding.btnBackspace.setOnClickListener {
-            viewModel.removeLastWord()
-        }
+        binding.btnSpeakBottom.setOnClickListener { viewModel.speakSentence() }
+        binding.btnClear.setOnClickListener { viewModel.clearSentence() }
+        binding.btnBackspace.setOnClickListener { viewModel.removeLastWord() }
         binding.btnSettings.setOnClickListener {
             startActivity(Intent(this, PinActivity::class.java))
         }
@@ -74,19 +70,16 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    // Grid columns
-                    (binding.vocabGrid.layoutManager as? GridLayoutManager)?.spanCount = state.gridColumns
-                    vocabAdapter.submitList(state.cards)
+                    (binding.vocabGrid.layoutManager as? GridLayoutManager)?.spanCount =
+                        state.gridColumns
+                    vocabAdapter.submitList(state.cardUiItems)
                     vocabAdapter.setShowLabels(state.showLabels)
 
-                    // Categories — populate LinearLayout directly
                     setupCategoryChips(state.categories, state.activeCategoryId)
-
-                    // Sentence strip
                     updateSentenceStrip(state.sentenceItems)
 
-                    // Placeholder
-                    binding.placeholder.visibility = if (state.placeholderVisible) View.VISIBLE else View.GONE
+                    binding.placeholder.visibility =
+                        if (state.placeholderVisible) View.VISIBLE else View.GONE
                 }
             }
         }
@@ -97,25 +90,23 @@ class MainActivity : AppCompatActivity() {
 
         categories.forEach { category ->
             val chipBinding = ItemCategoryChipBinding.inflate(
-                LayoutInflater.from(this), binding.categoryContainer, false
+                LayoutInflater.from(this), binding.categoryContainer, false,
             )
             chipBinding.chipIcon.text = category.icon
             chipBinding.chipText.text = category.name
 
             val isActive = category.id == activeId
-            val bgColor = if (isActive) {
-                ContextCompat.getColor(this, R.color.primary_container)
-            } else {
-                ContextCompat.getColor(this, R.color.surface_container)
-            }
-            chipBinding.chipContainer.setBackgroundColor(bgColor)
-
+            chipBinding.chipContainer.isSelected = isActive
             val textColor = if (isActive) {
-                ContextCompat.getColor(this, R.color.on_primary_container)
+                ContextCompat.getColor(this, android.R.color.white)
             } else {
-                ContextCompat.getColor(this, R.color.on_surface_variant)
+                val (_, labelRes) = CategoryTinter.colorsFor(
+                    BoardViewModel.CATEGORY_ID_TO_CODE[category.id],
+                )
+                ContextCompat.getColor(this, labelRes)
             }
             chipBinding.chipText.setTextColor(textColor)
+            chipBinding.chipIcon.setTextColor(textColor)
 
             chipBinding.chipContainer.setOnClickListener {
                 viewModel.selectCategory(if (category.id == activeId) null else category.id)
@@ -130,17 +121,11 @@ class MainActivity : AppCompatActivity() {
 
         items.forEachIndexed { index, item ->
             val chipBinding = ItemWordChipBinding.inflate(
-                LayoutInflater.from(this), binding.wordsContainer, false
+                LayoutInflater.from(this), binding.wordsContainer, false,
             )
             chipBinding.wordText.text = item.word
-            chipBinding.wordChip.setOnClickListener {
-                viewModel.removeWordAt(index)
-            }
+            chipBinding.wordChip.setOnClickListener { viewModel.removeWordAt(index) }
             binding.wordsContainer.addView(chipBinding.root)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 }

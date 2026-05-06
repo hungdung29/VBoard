@@ -13,14 +13,26 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
+/**
+ * One vocab card's UI projection. Built by [BoardViewModel] from a [VocabCard]
+ * + the matching [Category] so that the adapter can render category-aware
+ * tint without re-reading the data layer.
+ */
+data class VocabCardUiItem(
+    val id: String,
+    val word: String,
+    val emoji: String,
+    val categoryCode: String,
+)
+
 data class BoardUiState(
+    val cardUiItems: List<VocabCardUiItem> = emptyList(),
     val cards: List<VocabCard> = emptyList(),
     val categories: List<Category> = emptyList(),
     val sentenceItems: List<SentenceItem> = emptyList(),
@@ -28,7 +40,7 @@ data class BoardUiState(
     val gridColumns: Int = 3,
     val showLabels: Boolean = true,
     val ttsReady: Boolean = false,
-    val placeholderVisible: Boolean = true
+    val placeholderVisible: Boolean = true,
 )
 
 private data class CombinedFlow1(
@@ -36,7 +48,7 @@ private data class CombinedFlow1(
     val categories: List<Category>,
     val sentences: List<SentenceItem>,
     val activeCat: String?,
-    val gridColumns: Int
+    val gridColumns: Int,
 )
 
 @HiltViewModel
@@ -44,12 +56,11 @@ class BoardViewModel @Inject constructor(
     private val vocabRepo: IVocabRepository,
     private val settingsRepo: ISettingsRepository,
     private val statsRepo: IStatsRepository,
-    private val ttsManager: TextToSpeechManager
+    private val ttsManager: TextToSpeechManager,
 ) : ViewModel() {
 
     private val _sentenceItems = MutableStateFlow<List<SentenceItem>>(emptyList())
     private val _activeCategoryId = MutableStateFlow<String?>(null)
-    private val _placeholderVisible = MutableStateFlow(true)
 
     val uiState: StateFlow<BoardUiState> = combine(
         combine(
@@ -57,19 +68,30 @@ class BoardViewModel @Inject constructor(
             vocabRepo.getAllCategories(),
             _sentenceItems,
             _activeCategoryId,
-            settingsRepo.gridColumns
+            settingsRepo.gridColumns,
         ) { cards, categories, sentences, activeCat, gridColumns ->
             CombinedFlow1(cards, categories, sentences, activeCat, gridColumns)
         },
-        settingsRepo.showLabels
+        settingsRepo.showLabels,
     ) { combined, showLabels ->
         val (cards, categories, sentences, activeCat, gridColumns) = combined
-        val filteredCards = if (activeCat == null) {
-            cards
-        } else {
-            cards.filter { it.categoryId == activeCat }
+        val filteredCards = if (activeCat == null) cards
+        else cards.filter { it.categoryId == activeCat }
+
+        val categoryById: Map<String, Category> = categories.associateBy { it.id }
+        val uiItems = filteredCards.map { card ->
+            val category = categoryById[card.categoryId]
+            VocabCardUiItem(
+                id = card.id,
+                word = card.word,
+                emoji = category?.icon?.takeIf { it.isNotBlank() }
+                    ?: VocabEmojiMap.emojiFor(card.word),
+                categoryCode = CATEGORY_ID_TO_CODE[card.categoryId] ?: "none",
+            )
         }
+
         BoardUiState(
+            cardUiItems = uiItems,
             cards = filteredCards,
             categories = categories,
             sentenceItems = sentences,
@@ -77,60 +99,58 @@ class BoardViewModel @Inject constructor(
             gridColumns = gridColumns,
             showLabels = showLabels,
             ttsReady = ttsManager.isReady,
-            placeholderVisible = sentences.isEmpty()
+            placeholderVisible = sentences.isEmpty(),
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = BoardUiState(ttsReady = ttsManager.isReady)
+        initialValue = BoardUiState(ttsReady = ttsManager.isReady),
     )
 
     init {
-        viewModelScope.launch {
-            vocabRepo.seedDefaultData()
-        }
+        viewModelScope.launch { vocabRepo.seedDefaultData() }
     }
 
     fun selectCategory(categoryId: String?) {
         _activeCategoryId.value = categoryId
     }
 
+    fun addWordToSentence(item: VocabCardUiItem) {
+        _sentenceItems.value = _sentenceItems.value + SentenceItem(
+            id = UUID.randomUUID().toString(),
+            word = item.word,
+            cardId = item.id,
+        )
+        viewModelScope.launch { statsRepo.recordWordUsage(item.word) }
+    }
+
+    /** Backwards-compat overload while non-Board code still passes VocabCard. */
     fun addWordToSentence(card: VocabCard) {
-        val item = SentenceItem(
+        _sentenceItems.value = _sentenceItems.value + SentenceItem(
             id = UUID.randomUUID().toString(),
             word = card.word,
-            cardId = card.id
+            cardId = card.id,
         )
-        _sentenceItems.value = _sentenceItems.value + item
-        _placeholderVisible.value = false
-
-        viewModelScope.launch {
-            statsRepo.recordWordUsage(card.word)
-        }
+        viewModelScope.launch { statsRepo.recordWordUsage(card.word) }
     }
 
     fun removeLastWord() {
         val current = _sentenceItems.value
         if (current.isNotEmpty()) {
             _sentenceItems.value = current.dropLast(1)
-            _placeholderVisible.value = current.size == 1
         }
     }
 
     fun clearSentence() {
         _sentenceItems.value = emptyList()
-        _placeholderVisible.value = true
     }
 
     fun speakSentence() {
         val words = _sentenceItems.value
         if (words.isEmpty()) return
-
         val text = words.joinToString(" ") { it.word }
         ttsManager.speak(text) {
-            viewModelScope.launch {
-                statsRepo.recordSentence()
-            }
+            viewModelScope.launch { statsRepo.recordSentence() }
         }
     }
 
@@ -139,7 +159,6 @@ class BoardViewModel @Inject constructor(
         if (index in current.indices) {
             current.removeAt(index)
             _sentenceItems.value = current
-            _placeholderVisible.value = current.isEmpty()
         }
     }
 
@@ -147,4 +166,51 @@ class BoardViewModel @Inject constructor(
         super.onCleared()
         ttsManager.shutdown()
     }
+
+    companion object {
+        /**
+         * Maps the seeded VBoard category IDs to the 6 design-token category
+         * codes (food, family, emotion, activity, object, place). Two seed
+         * categories share each visual code intentionally — see spec §2.1.
+         */
+        val CATEGORY_ID_TO_CODE: Map<String, String> = mapOf(
+            "cat-1" to "family",
+            "cat-2" to "food",
+            "cat-3" to "place",     // Nhà cửa
+            "cat-4" to "activity",  // Chơi
+            "cat-5" to "emotion",
+            "cat-6" to "activity",  // Hành động
+            "cat-7" to "object",
+            "cat-8" to "place",     // Nơi chốn
+        )
+    }
+}
+
+/**
+ * Lookup of word → emoji used as a fallback when the underlying [Category]
+ * doesn't supply an icon. Kept here (formerly in VocabGridAdapter) because the
+ * adapter now consumes pre-built UI items.
+ */
+internal object VocabEmojiMap {
+    fun emojiFor(word: String): String = MAP[word] ?: "📝"
+
+    private val MAP = mapOf(
+        "Mẹ" to "👩", "Ba" to "👨", "Em" to "👧", "Ông" to "👴", "Bà" to "👵",
+        "Con" to "👶", "Anh" to "🧑", "Chị" to "👩‍🦱",
+        "Nước" to "💧", "Cơm" to "🍚", "Bánh" to "🍰", "Sữa" to "🥛",
+        "Trái cây" to "🍎", "Thịt" to "🥩", "Cá" to "🐟", "Rau" to "🥬",
+        "Trà" to "🍵", "Bánh mì" to "🥖",
+        "Nhà" to "🏠", "Phòng" to "🚪", "Giường" to "🛏️", "Cửa" to "🚪",
+        "Cửa sổ" to "🪟", "Bếp" to "🍳", "Tivi" to "📺",
+        "Chơi" to "🎮", "Đồ chơi" to "🧸", "Bóng" to "⚽", "Sách" to "📖",
+        "Đi dạo" to "🚶", "Bơi" to "🏊", "Nhảy" to "🕺", "Hát" to "🎵",
+        "Vui" to "😊", "Buồn" to "😢", "Sợ" to "😨", "Mệt" to "😫",
+        "Đói" to "😫", "Khát" to "🥤", "Nóng" to "🔥", "Lạnh" to "❄️",
+        "Muốn" to "💭", "Cần" to "✋", "Đi" to "🚶", "Ngủ" to "😴",
+        "Tắm" to "🚿", "Mặc" to "👕", "Đi học" to "🏫", "Xem" to "👀",
+        "Bút" to "✏️", "Giấy" to "📄", "Bảng" to "📋",
+        "Điện thoại" to "📱", "Máy tính" to "💻", "Ô tô" to "🚗",
+        "Trường" to "🏫", "Bệnh viện" to "🏥", "Công viên" to "🌳",
+        "Siêu thị" to "🛒", "Biển" to "🌊",
+    )
 }
