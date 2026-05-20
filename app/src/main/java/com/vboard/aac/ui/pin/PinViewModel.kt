@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vboard.aac.domain.repository.ISettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +17,9 @@ data class PinUiState(
     val isError: Boolean = false,
     val isUnlocked: Boolean = false,
     val mathQuestion: String = "",
-    val mathAnswer: Int = 0
+    val mathAnswer: Int = 0,
+    val isLocked: Boolean = false,
+    val lockoutSeconds: Int = 0
 )
 
 @HiltViewModel
@@ -26,6 +29,9 @@ class PinViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(PinUiState())
     val uiState: StateFlow<PinUiState> = _uiState.asStateFlow()
+
+    private var failedAttempts = 0
+    private val maxAttempts = 5
 
     init {
         generateMathChallenge()
@@ -47,6 +53,7 @@ class PinViewModel @Inject constructor(
     }
 
     fun onDigitEntered(digit: String) {
+        if (_uiState.value.isLocked) return
         val current = _uiState.value.enteredDigits
         if (current.length >= 4) return
 
@@ -59,6 +66,7 @@ class PinViewModel @Inject constructor(
     }
 
     fun onBackspace() {
+        if (_uiState.value.isLocked) return
         val current = _uiState.value.enteredDigits
         if (current.isNotEmpty()) {
             _uiState.value = _uiState.value.copy(
@@ -76,11 +84,29 @@ class PinViewModel @Inject constructor(
         viewModelScope.launch {
             val isCorrect = settingsRepo.verifyPin(pin)
             if (isCorrect) {
+                failedAttempts = 0
                 _uiState.value = _uiState.value.copy(isUnlocked = true)
             } else {
+                failedAttempts++
                 _uiState.value = _uiState.value.copy(enteredDigits = "", isError = true)
                 generateMathChallenge()
+
+                if (failedAttempts >= maxAttempts) {
+                    lockout()
+                }
             }
+        }
+    }
+
+    private fun lockout() {
+        _uiState.value = _uiState.value.copy(isLocked = true, lockoutSeconds = 30)
+        viewModelScope.launch {
+            for (seconds in 30 downTo 1) {
+                _uiState.value = _uiState.value.copy(lockoutSeconds = seconds)
+                delay(1000)
+            }
+            failedAttempts = 0
+            _uiState.value = _uiState.value.copy(isLocked = false, lockoutSeconds = 0)
         }
     }
 }

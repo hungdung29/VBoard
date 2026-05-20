@@ -1,36 +1,55 @@
 package com.vboard.aac.platform.tts
 
 import android.content.Context
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
+import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
+import com.vboard.aac.domain.repository.ISettingsRepository
+import com.vboard.aac.domain.repository.IVoiceProfileRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TextToSpeechManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val settingsRepository: ISettingsRepository,
+    private val voiceProfileRepository: IVoiceProfileRepository
 ) : TextToSpeech.OnInitListener {
 
     private var tts: TextToSpeech? = null
-    private var isInitialized = false
+    private val _isReady = MutableStateFlow(false)
+    val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
+
     private var onCompleteCallback: (() -> Unit)? = null
     private var speechRate = 0.4f
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    val isReady: Boolean get() = isInitialized
+    private var voiceCloningEnabled = false
 
     init {
         tts = TextToSpeech(context, this)
+
+        // Listen for voice cloning setting
+        scope.launch {
+            settingsRepository.voiceCloningEnabled.collect { enabled ->
+                voiceCloningEnabled = enabled
+            }
+        }
     }
 
     override fun onInit(status: Int) {
-        isInitialized = status == TextToSpeech.SUCCESS
-        if (isInitialized) {
+        if (status == TextToSpeech.SUCCESS) {
             val result = tts?.setLanguage(Locale("vi", "VN"))
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                 tts?.setLanguage(Locale("vi"))
@@ -38,18 +57,41 @@ class TextToSpeechManager @Inject constructor(
             tts?.setSpeechRate(speechRate)
             tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                 override fun onDone(utteranceId: String?) {
-                    onCompleteCallback?.invoke()
+                    onCompleteCallback?.let { callback ->
+                        mainHandler.post { callback() }
+                    }
                 }
 
                 override fun onError(utteranceId: String?) {}
                 override fun onStart(utteranceId: String?) {}
             })
+            _isReady.value = true
         }
     }
 
     fun speak(text: String, onComplete: (() -> Unit)? = null) {
-        if (!isInitialized || text.isBlank()) return
+        if (_isReady.value.not() || text.isBlank()) return
+
         onCompleteCallback = onComplete
+
+        if (voiceCloningEnabled) {
+            // Voice cloning mode - use voice profile if available
+            scope.launch {
+                val profile = voiceProfileRepository.getActiveProfile()
+                if (profile != null) {
+                    // TODO: Use voice cloning synthesis when engine is ready
+                    // For now, fall back to system TTS
+                    speakWithSystemTts(text)
+                } else {
+                    speakWithSystemTts(text)
+                }
+            }
+        } else {
+            speakWithSystemTts(text)
+        }
+    }
+
+    private fun speakWithSystemTts(text: String) {
         val utteranceId = "vboard_${System.currentTimeMillis()}"
         tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, utteranceId)
     }
@@ -67,9 +109,13 @@ class TextToSpeechManager @Inject constructor(
         speak(text)
     }
 
+    fun isVoiceCloningEnabled(): Boolean = voiceCloningEnabled
+
     fun shutdown() {
+        tts?.stop()
         tts?.shutdown()
         tts = null
-        isInitialized = false
+        _isReady.value = false
+        onCompleteCallback = null
     }
 }

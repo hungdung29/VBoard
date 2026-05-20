@@ -11,6 +11,7 @@ interface ISettingsRepository {
     val pinCode: Flow<String>
     val voiceVolume: Flow<Float>
     val voiceType: Flow<String>
+    val voiceCloningEnabled: Flow<Boolean>
     val appSettings: Flow<AppSettings>
 
     suspend fun setDarkMode(enabled: Boolean)
@@ -20,5 +21,6 @@ interface ISettingsRepository {
     suspend fun setPinCode(code: String)
     suspend fun setVoiceVolume(volume: Float)
     suspend fun setVoiceType(type: String)
+    suspend fun setVoiceCloningEnabled(enabled: Boolean)
     suspend fun verifyPin(pin: String): Boolean
 }

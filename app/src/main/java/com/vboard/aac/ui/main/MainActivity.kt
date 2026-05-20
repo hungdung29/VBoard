@@ -35,6 +35,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var vocabAdapter: VocabGridAdapter
 
+    private var lastCategories: List<Category> = emptyList()
+    private var lastCategoryId: String? = null
+    private var lastSentenceItems: List<SentenceItem> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -51,7 +55,6 @@ class MainActivity : AppCompatActivity() {
             viewModel.addWordToSentence(card)
         }
 
-        binding.vocabGrid.layoutManager = GridLayoutManager(this, 3)
         binding.vocabGrid.adapter = vocabAdapter
     }
 
@@ -74,16 +77,29 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    // Grid columns
-                    (binding.vocabGrid.layoutManager as? GridLayoutManager)?.spanCount = state.gridColumns
+                    // Grid columns — update layoutManager span count
+                    val layoutManager = binding.vocabGrid.layoutManager as? GridLayoutManager
+                    if (layoutManager == null) {
+                        binding.vocabGrid.layoutManager = GridLayoutManager(this@MainActivity, state.gridColumns)
+                    } else if (layoutManager.spanCount != state.gridColumns) {
+                        layoutManager.spanCount = state.gridColumns
+                    }
+
                     vocabAdapter.submitList(state.cards)
                     vocabAdapter.setShowLabels(state.showLabels)
 
-                    // Categories — populate LinearLayout directly
-                    setupCategoryChips(state.categories, state.activeCategoryId)
+                    // Categories — only update if changed
+                    if (state.categories != lastCategories || state.activeCategoryId != lastCategoryId) {
+                        lastCategories = state.categories
+                        lastCategoryId = state.activeCategoryId
+                        setupCategoryChips(state.categories, state.activeCategoryId)
+                    }
 
-                    // Sentence strip
-                    updateSentenceStrip(state.sentenceItems)
+                    // Sentence strip — only update if changed
+                    if (state.sentenceItems != lastSentenceItems) {
+                        lastSentenceItems = state.sentenceItems
+                        updateSentenceStrip(state.sentenceItems)
+                    }
 
                     // Placeholder
                     binding.placeholder.visibility = if (state.placeholderVisible) View.VISIBLE else View.GONE
@@ -101,6 +117,7 @@ class MainActivity : AppCompatActivity() {
             )
             chipBinding.chipIcon.text = category.icon
             chipBinding.chipText.text = category.name
+            chipBinding.chipContainer.contentDescription = getString(R.string.cd_category, category.name)
 
             val isActive = category.id == activeId
             val bgColor = if (isActive) {
@@ -133,14 +150,11 @@ class MainActivity : AppCompatActivity() {
                 LayoutInflater.from(this), binding.wordsContainer, false
             )
             chipBinding.wordText.text = item.word
+            chipBinding.wordChip.contentDescription = getString(R.string.cd_remove_word, item.word)
             chipBinding.wordChip.setOnClickListener {
                 viewModel.removeWordAt(index)
             }
             binding.wordsContainer.addView(chipBinding.root)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 }

@@ -83,18 +83,21 @@ class EditViewModel @Inject constructor(
     fun updateCard(id: String, word: String, categoryId: String, imagePath: String?) {
         viewModelScope.launch {
             _isLoading.value = true
-            val existing = vocabRepo.getCardById(id)
-            if (existing != null) {
-                vocabRepo.updateCard(
-                    existing.copy(
-                        word = word.trim(),
-                        categoryId = categoryId,
-                        localImagePath = imagePath ?: existing.localImagePath
+            try {
+                val existing = vocabRepo.getCardById(id)
+                if (existing != null) {
+                    vocabRepo.updateCard(
+                        existing.copy(
+                            word = word.trim(),
+                            categoryId = categoryId,
+                            localImagePath = imagePath ?: existing.localImagePath
+                        )
                     )
-                )
-                _message.value = "Đã cập nhật thẻ"
+                    _message.value = "Đã cập nhật thẻ"
+                }
+            } finally {
+                _isLoading.value = false
             }
-            _isLoading.value = false
         }
     }
 

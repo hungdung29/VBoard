@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.vboard.aac.databinding.ActivityVoiceSettingsBinding
 import com.vboard.aac.ui.settings.VoiceSettingsViewModel
+import com.vboard.aac.ui.voicetest.VoiceRecordingDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -55,6 +56,11 @@ class VoiceSettingsActivity : AppCompatActivity() {
                 else -> "nam-bac"
             }
             viewModel.setVoiceType(type)
+        }
+
+        binding.btnVoiceClone.setOnClickListener {
+            VoiceRecordingDialogFragment.newInstance()
+                .show(supportFragmentManager, VoiceRecordingDialogFragment.TAG)
         }
     }
 

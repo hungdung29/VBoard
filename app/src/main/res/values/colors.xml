@@ -41,6 +41,9 @@
     <color name="outline">#7e775f</color>
     <color name="outline_variant">#d0c6ab</color>
 
+    <!-- Success Green -->
+    <color name="green_500">#4CAF50</color>
+
     <!-- Error -->
     <color name="error">#ba1a1a</color>
     <color name="error_container">#ffdad6</color>

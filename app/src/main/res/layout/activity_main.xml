@@ -20,8 +20,8 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Cai dat"
-            android:src="@android:drawable/ic_menu_preferences"
+            android:contentDescription="@string/cd_settings"
+            android:src="@drawable/ic_settings"
             app:tint="@color/primary" />
 
         <TextView
@@ -90,7 +90,7 @@
                 android:layout_height="40dp"
                 android:layout_marginStart="@dimen/spacing_md"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Xoa"
+                android:contentDescription="@string/cd_backspace"
                 android:src="@android:drawable/ic_input_delete"
                 app:tint="@color/on_surface_variant" />
         </LinearLayout>
@@ -146,6 +146,7 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/button_height_large"
             android:layout_weight="1"
+            android:contentDescription="@string/cd_speak"
             android:text="@string/btn_speak"
             android:textColor="@color/on_secondary_container"
             android:textSize="14sp"
@@ -165,6 +166,7 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/button_height_large"
             android:layout_weight="1"
+            android:contentDescription="@string/cd_clear"
             android:text="@string/btn_clear"
             android:textColor="@color/on_error"
             android:textSize="14sp"

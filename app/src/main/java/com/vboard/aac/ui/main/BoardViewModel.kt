@@ -31,7 +31,7 @@ data class BoardUiState(
     val placeholderVisible: Boolean = true
 )
 
-private data class CombinedFlow1(
+private data class CombinedFlow(
     val cards: List<VocabCard>,
     val categories: List<Category>,
     val sentences: List<SentenceItem>,
@@ -49,7 +49,6 @@ class BoardViewModel @Inject constructor(
 
     private val _sentenceItems = MutableStateFlow<List<SentenceItem>>(emptyList())
     private val _activeCategoryId = MutableStateFlow<String?>(null)
-    private val _placeholderVisible = MutableStateFlow(true)
 
     val uiState: StateFlow<BoardUiState> = combine(
         combine(
@@ -59,10 +58,11 @@ class BoardViewModel @Inject constructor(
             _activeCategoryId,
             settingsRepo.gridColumns
         ) { cards, categories, sentences, activeCat, gridColumns ->
-            CombinedFlow1(cards, categories, sentences, activeCat, gridColumns)
+            CombinedFlow(cards, categories, sentences, activeCat, gridColumns)
         },
-        settingsRepo.showLabels
-    ) { combined, showLabels ->
+        settingsRepo.showLabels,
+        ttsManager.isReady
+    ) { combined, showLabels, ttsReady ->
         val (cards, categories, sentences, activeCat, gridColumns) = combined
         val filteredCards = if (activeCat == null) {
             cards
@@ -76,13 +76,13 @@ class BoardViewModel @Inject constructor(
             activeCategoryId = activeCat,
             gridColumns = gridColumns,
             showLabels = showLabels,
-            ttsReady = ttsManager.isReady,
+            ttsReady = ttsReady,
             placeholderVisible = sentences.isEmpty()
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = BoardUiState(ttsReady = ttsManager.isReady)
+        initialValue = BoardUiState()
     )
 
     init {
@@ -102,7 +102,6 @@ class BoardViewModel @Inject constructor(
             cardId = card.id
         )
         _sentenceItems.value = _sentenceItems.value + item
-        _placeholderVisible.value = false
 
         viewModelScope.launch {
             statsRepo.recordWordUsage(card.word)
@@ -113,13 +112,11 @@ class BoardViewModel @Inject constructor(
         val current = _sentenceItems.value
         if (current.isNotEmpty()) {
             _sentenceItems.value = current.dropLast(1)
-            _placeholderVisible.value = current.size == 1
         }
     }
 
     fun clearSentence() {
         _sentenceItems.value = emptyList()
-        _placeholderVisible.value = true
     }
 
     fun speakSentence() {
@@ -139,12 +136,6 @@ class BoardViewModel @Inject constructor(
         if (index in current.indices) {
             current.removeAt(index)
             _sentenceItems.value = current
-            _placeholderVisible.value = current.isEmpty()
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        ttsManager.shutdown()
     }
 }

@@ -12,6 +12,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.vboard.aac.domain.model.AppSettings
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,6 +31,7 @@ class AppPreferencesDataStore @Inject constructor(
         val PIN_CODE = stringPreferencesKey("pin_code")
         val VOICE_VOLUME = floatPreferencesKey("voice_volume")
         val VOICE_TYPE = stringPreferencesKey("voice_type")
+        val VOICE_CLONING_ENABLED = booleanPreferencesKey("voice_cloning_enabled")
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 
@@ -73,6 +75,10 @@ class AppPreferencesDataStore @Inject constructor(
         prefs[Keys.VOICE_TYPE] ?: "nam-bac"
     }
 
+    val voiceCloningEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.VOICE_CLONING_ENABLED] ?: false
+    }
+
     suspend fun setDarkMode(enabled: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[Keys.DARK_MODE] = enabled
@@ -98,8 +104,12 @@ class AppPreferencesDataStore @Inject constructor(
     }
 
     suspend fun setPinCode(code: String) {
+        val trimmed = code.trim()
+        if (trimmed.length !in 4..8 || !trimmed.all { it.isDigit() }) {
+            return
+        }
         context.dataStore.edit { prefs ->
-            prefs[Keys.PIN_CODE] = code
+            prefs[Keys.PIN_CODE] = trimmed
         }
     }
 
@@ -115,12 +125,14 @@ class AppPreferencesDataStore @Inject constructor(
         }
     }
 
-    suspend fun isOnboardingCompleted(): Boolean {
-        var completed = false
+    suspend fun setVoiceCloningEnabled(enabled: Boolean) {
         context.dataStore.edit { prefs ->
-            completed = prefs[Keys.ONBOARDING_COMPLETED] ?: false
+            prefs[Keys.VOICE_CLONING_ENABLED] = enabled
         }
-        return completed
+    }
+
+    suspend fun isOnboardingCompleted(): Boolean {
+        return context.dataStore.data.first()[Keys.ONBOARDING_COMPLETED] ?: false
     }
 
     suspend fun setOnboardingCompleted() {

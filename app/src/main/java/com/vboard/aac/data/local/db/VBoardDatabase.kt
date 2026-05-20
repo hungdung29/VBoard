@@ -8,6 +8,7 @@ import com.vboard.aac.data.local.db.dao.VocabCardDao
 import com.vboard.aac.data.local.db.entity.CategoryEntity
 import com.vboard.aac.data.local.db.entity.DailyStatsEntity
 import com.vboard.aac.data.local.db.entity.VocabCardEntity
+import com.vboard.aac.data.local.db.entity.VoiceProfileEntity
 import com.vboard.aac.data.local.db.entity.WordUsageEntity
 
 @Database(
@@ -15,15 +16,17 @@ import com.vboard.aac.data.local.db.entity.WordUsageEntity
         VocabCardEntity::class,
         CategoryEntity::class,
         WordUsageEntity::class,
-        DailyStatsEntity::class
+        DailyStatsEntity::class,
+        VoiceProfileEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class VBoardDatabase : RoomDatabase() {
     abstract fun vocabCardDao(): VocabCardDao
     abstract fun categoryDao(): CategoryDao
     abstract fun statsDao(): StatsDao
+    abstract fun voiceProfileDao(): VoiceProfileDao
 
     companion object {
         const val DATABASE_NAME = "vboard_aac.db"

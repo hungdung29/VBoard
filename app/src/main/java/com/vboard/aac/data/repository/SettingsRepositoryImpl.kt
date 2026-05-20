@@ -27,6 +27,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override val voiceType: Flow<String> = dataStore.voiceType
 
+    override val voiceCloningEnabled: Flow<Boolean> = dataStore.voiceCloningEnabled
+
     override val appSettings: Flow<AppSettings> = dataStore.appSettings
 
     override suspend fun setDarkMode(enabled: Boolean) {
@@ -55,6 +57,10 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setVoiceType(type: String) {
         dataStore.setVoiceType(type)
+    }
+
+    override suspend fun setVoiceCloningEnabled(enabled: Boolean) {
+        dataStore.setVoiceCloningEnabled(enabled)
     }
 
     override suspend fun verifyPin(pin: String): Boolean {

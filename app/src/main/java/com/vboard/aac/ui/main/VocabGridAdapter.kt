@@ -54,6 +54,11 @@ class VocabGridAdapter(
             // Emoji fallback map
             val emoji = EMOJI_MAP[card.word] ?: "📝"
             binding.emojiText.text = emoji
+
+            // Accessibility
+            binding.vocabCard.contentDescription = binding.root.context.getString(
+                com.vboard.aac.R.string.cd_vocab_card, card.word
+            )
         }
     }
 

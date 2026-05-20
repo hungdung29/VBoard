@@ -22,7 +22,7 @@
             android:id="@+id/icon"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@android:drawable/ic_menu_preferences"
+            android:src="@drawable/ic_settings"
             app:tint="@color/on_primary_container" />
     </LinearLayout>
 

@@ -96,4 +96,13 @@
     <!-- Folder -->
     <string name="add_folder_title">Tạo thư mục mới</string>
     <string name="folder_name_hint">Tên thư mục</string>
+
+    <!-- Accessibility / Content Descriptions -->
+    <string name="cd_speak">Phát âm câu đã ghép</string>
+    <string name="cd_clear">Xóa toàn bộ câu</string>
+    <string name="cd_backspace">Xóa từ cuối</string>
+    <string name="cd_settings">Mở cài đặt dành cho phụ huynh</string>
+    <string name="cd_remove_word">Xóa từ %1$s</string>
+    <string name="cd_vocab_card">Thẻ từ vựng: %1$s</string>
+    <string name="cd_category">Danh mục: %1$s</string>
 </resources>

@@ -88,6 +88,19 @@ class PinActivity : AppCompatActivity() {
                         }
                     }
 
+                    // Lockout state
+                    binding.btn1.isEnabled = !state.isLocked
+                    binding.btn2.isEnabled = !state.isLocked
+                    binding.btn3.isEnabled = !state.isLocked
+                    binding.btn4.isEnabled = !state.isLocked
+                    binding.btn5.isEnabled = !state.isLocked
+                    binding.btn6.isEnabled = !state.isLocked
+                    binding.btn7.isEnabled = !state.isLocked
+                    binding.btn8.isEnabled = !state.isLocked
+                    binding.btn9.isEnabled = !state.isLocked
+                    binding.btn0.isEnabled = !state.isLocked
+                    binding.btnBackspace.isEnabled = !state.isLocked
+
                     // Unlocked
                     if (state.isUnlocked) {
                         hapticManager.success()

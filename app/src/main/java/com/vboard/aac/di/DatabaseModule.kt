@@ -3,6 +3,7 @@ package com.vboard.aac.di
 import android.content.Context
 import androidx.room.Room
 import com.vboard.aac.data.local.db.VBoardDatabase
+import com.vboard.aac.data.local.db.VoiceProfileDao
 import com.vboard.aac.data.local.db.dao.CategoryDao
 import com.vboard.aac.data.local.db.dao.StatsDao
 import com.vboard.aac.data.local.db.dao.VocabCardDao
@@ -47,5 +48,11 @@ object DatabaseModule {
     @Singleton
     fun provideStatsDao(database: VBoardDatabase): StatsDao {
         return database.statsDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideVoiceProfileDao(database: VBoardDatabase): VoiceProfileDao {
+        return database.voiceProfileDao()
     }
 }
