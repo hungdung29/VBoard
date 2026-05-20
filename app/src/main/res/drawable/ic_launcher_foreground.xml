@@ -4,10 +4,34 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Speaker cone - main body -->
     <path
-        android:fillColor="#705d00"
-        android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0"/>
+        android:fillColor="#FFC107"
+        android:pathData="M30,38 L30,70 L42,70 L52,82 L52,26 L42,38 Z"/>
+
+    <!-- Sound wave 1 - closest to speaker -->
     <path
-        android:fillColor="#ffffff"
-        android:pathData="M38,45 L38,65 L42,65 L42,55 L50,55 L50,65 L54,65 L54,55 L62,55 L62,65 L66,65 L66,45 L62,45 L62,52 L54,52 L54,45 L50,45 L50,52 L42,52 L42,45 Z"/>
+        android:pathData="M58,44 C62,44 66,48 66,54 C66,60 62,64 58,64"
+        android:strokeWidth="3"
+        android:strokeColor="#FFC107"
+        android:fillColor="#00000000"
+        android:strokeLineCap="round"/>
+
+    <!-- Sound wave 2 - middle -->
+    <path
+        android:pathData="M64,38 C70,38 76,45 76,54 C76,63 70,70 64,70"
+        android:strokeWidth="3"
+        android:strokeColor="#FFC107"
+        android:fillColor="#00000000"
+        android:strokeLineCap="round"/>
+
+    <!-- Sound wave 3 - farthest -->
+    <path
+        android:pathData="M70,32 C78,32 86,42 86,54 C86,66 78,76 70,76"
+        android:strokeWidth="3"
+        android:strokeColor="#FFC107"
+        android:fillColor="#00000000"
+        android:strokeLineCap="round"/>
+
 </vector>

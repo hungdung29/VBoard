@@ -20,6 +20,10 @@
     <color name="primary_fixed">#ffe16d</color>
     <color name="primary_fixed_dim">#e9c400</color>
 
+    <!-- App Icon Colors -->
+    <color name="icon_background">#ffffff</color>
+    <color name="icon_foreground">#FFC107</color>
+
     <!-- Secondary - Green -->
     <color name="secondary">#006e1c</color>
     <color name="secondary_container">#91f78e</color>
