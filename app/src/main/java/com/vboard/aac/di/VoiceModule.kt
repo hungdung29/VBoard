@@ -1,13 +1,11 @@
 package com.vboard.aac.di
 
 import android.content.Context
-import com.vboard.aac.data.local.db.VoiceProfileDao
 import com.vboard.aac.data.repository.VoiceProfileRepositoryImpl
 import com.vboard.aac.domain.repository.IVoiceProfileRepository
 import com.vboard.aac.platform.audio.AudioQualityAnalyzer
 import com.vboard.aac.platform.audio.AudioRecorderManager
 import com.vboard.aac.platform.voice.DeviceCapabilityDetector
-import com.vboard.aac.platform.voice.VoiceCloningManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -46,11 +44,4 @@ object VoicePlatformModule {
     fun provideDeviceCapabilityDetector(
         @ApplicationContext context: Context
     ): DeviceCapabilityDetector = DeviceCapabilityDetector(context)
-
-    @Provides
-    @Singleton
-    fun provideVoiceCloningManager(
-        @ApplicationContext context: Context,
-        deviceCapabilityDetector: DeviceCapabilityDetector
-    ): VoiceCloningManager = VoiceCloningManager(context, deviceCapabilityDetector)
 }

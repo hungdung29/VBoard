@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.vboard.aac.databinding.ActivityVoiceSettingsBinding
 import com.vboard.aac.ui.settings.VoiceSettingsViewModel
-import com.vboard.aac.ui.voicetest.VoiceRecordingDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -58,10 +57,9 @@ class VoiceSettingsActivity : AppCompatActivity() {
             viewModel.setVoiceType(type)
         }
 
-        binding.btnVoiceClone.setOnClickListener {
-            VoiceRecordingDialogFragment.newInstance()
-                .show(supportFragmentManager, VoiceRecordingDialogFragment.TAG)
-        }
+        // TODO: Voice cloning will be implemented with Valtec-TTS
+        binding.btnVoiceClone.isEnabled = false
+        binding.btnVoiceClone.setOnClickListener(null)
     }
 
     private fun observeState() {
