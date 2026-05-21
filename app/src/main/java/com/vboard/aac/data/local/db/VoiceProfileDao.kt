@@ -21,8 +21,8 @@ interface VoiceProfileDao {
     @Query("UPDATE voice_profiles SET is_active = 0")
     suspend fun deactivateAll()
 
-    @Query("UPDATE voice_profiles SET is_active = 1 WHERE id = :id")
-    suspend fun activate(id: String)
+    @Query("UPDATE voice_profiles SET is_active = :active WHERE id = :id")
+    suspend fun activate(id: String, active: Boolean = true)
 
     @Query("DELETE FROM voice_profiles WHERE id = :id")
     suspend fun delete(id: String)

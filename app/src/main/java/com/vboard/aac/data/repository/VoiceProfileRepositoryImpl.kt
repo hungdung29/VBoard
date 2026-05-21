@@ -30,9 +30,11 @@ class VoiceProfileRepositoryImpl @Inject constructor(
         voiceProfileDao.delete(id)
     }
 
-    override suspend fun setActiveProfile(id: String): Result<Unit> = runCatching {
-        voiceProfileDao.deactivateAll()
-        voiceProfileDao.activate(id)
+    override suspend fun setActiveProfile(id: String, active: Boolean): Result<Unit> = runCatching {
+        if (active) {
+            voiceProfileDao.deactivateAll()
+        }
+        voiceProfileDao.activate(id, active)
     }
 
     override suspend fun hasProfile(): Boolean {

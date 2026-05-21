@@ -5,7 +5,10 @@ import com.vboard.aac.data.repository.VoiceProfileRepositoryImpl
 import com.vboard.aac.domain.repository.IVoiceProfileRepository
 import com.vboard.aac.platform.audio.AudioQualityAnalyzer
 import com.vboard.aac.platform.audio.AudioRecorderManager
+import com.vboard.aac.platform.tts.ValtecTtsEngine
 import com.vboard.aac.platform.voice.DeviceCapabilityDetector
+import com.vboard.aac.platform.voice.VoiceProfileManager
+import com.vboard.aac.platform.voice.VoiceRecordingManager
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -44,4 +47,30 @@ object VoicePlatformModule {
     fun provideDeviceCapabilityDetector(
         @ApplicationContext context: Context
     ): DeviceCapabilityDetector = DeviceCapabilityDetector(context)
+
+    @Provides
+    @Singleton
+    fun provideValtecTtsEngine(
+        @ApplicationContext context: Context
+    ): ValtecTtsEngine = ValtecTtsEngine(context)
+
+    @Provides
+    @Singleton
+    fun provideVoiceRecordingManager(
+        @ApplicationContext context: Context
+    ): VoiceRecordingManager = VoiceRecordingManager(context)
+
+    @Provides
+    @Singleton
+    fun provideVoiceProfileManager(
+        voiceRecordingManager: VoiceRecordingManager,
+        valtecTtsEngine: ValtecTtsEngine,
+        voiceProfileRepository: IVoiceProfileRepository,
+        audioQualityAnalyzer: AudioQualityAnalyzer
+    ): VoiceProfileManager = VoiceProfileManager(
+        voiceRecordingManager,
+        valtecTtsEngine,
+        voiceProfileRepository,
+        audioQualityAnalyzer
+    )
 }
