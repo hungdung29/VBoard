@@ -108,6 +108,16 @@
             android:background="@drawable/bg_pin_dot_empty" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/pinErrorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/spacing_sm"
+        android:text="@string/pin_error"
+        android:textColor="@color/error"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
     <!-- Numpad -->
     <LinearLayout
         android:layout_width="wrap_content"

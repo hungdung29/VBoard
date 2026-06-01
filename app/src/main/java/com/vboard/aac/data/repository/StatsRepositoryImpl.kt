@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -22,6 +24,7 @@ class StatsRepositoryImpl @Inject constructor(
 ) : IStatsRepository {
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val isoDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     override fun getTodayStats(): Flow<DailyStats> {
         val today = dateFormat.format(Date())
@@ -44,12 +47,15 @@ class StatsRepositoryImpl @Inject constructor(
     }
 
     override fun getWeeklyStats(): Flow<List<DailyStats>> {
+        val last7Dates = last7DatesOldestToNewest()
         return statsDao.getRecentStats(7).map { list ->
-            list.map {
+            val byDate = list.associateBy { it.date }
+            last7Dates.map { date ->
+                val entry = byDate[date]
                 DailyStats(
-                    date = it.date,
-                    sentencesCount = it.sentencesCount,
-                    uniqueWords = it.uniqueWords
+                    date = date,
+                    sentencesCount = entry?.sentencesCount ?: 0,
+                    uniqueWords = entry?.uniqueWords ?: 0
                 )
             }
         }
@@ -86,5 +92,12 @@ class StatsRepositoryImpl @Inject constructor(
     override suspend fun clearAllStats() {
         statsDao.clearAllStats()
         statsDao.clearAllWordUsage()
+    }
+
+    private fun last7DatesOldestToNewest(): List<String> {
+        val today = LocalDate.now()
+        return (6 downTo 0).map { daysAgo ->
+            today.minusDays(daysAgo.toLong()).format(isoDateFormat)
+        }
     }
 }

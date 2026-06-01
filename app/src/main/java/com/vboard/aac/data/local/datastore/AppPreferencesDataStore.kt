@@ -41,9 +41,9 @@ class AppPreferencesDataStore @Inject constructor(
             gridColumns = prefs[Keys.GRID_COLUMNS] ?: 3,
             showLabels = prefs[Keys.SHOW_LABELS] ?: true,
             fontScale = prefs[Keys.FONT_SCALE] ?: 1.0f,
-            pinCode = prefs[Keys.PIN_CODE] ?: "1234",
+            pinCode = prefs[Keys.PIN_CODE] ?: "1973",
             voiceVolume = prefs[Keys.VOICE_VOLUME] ?: 1.0f,
-            voiceType = prefs[Keys.VOICE_TYPE] ?: "nam-bac"
+            voiceType = prefs[Keys.VOICE_TYPE] ?: "valtec-sf"
         )
     }
 
@@ -64,7 +64,7 @@ class AppPreferencesDataStore @Inject constructor(
     }
 
     val pinCode: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[Keys.PIN_CODE] ?: "1234"
+        prefs[Keys.PIN_CODE] ?: "1973"
     }
 
     val voiceVolume: Flow<Float> = context.dataStore.data.map { prefs ->
@@ -72,7 +72,7 @@ class AppPreferencesDataStore @Inject constructor(
     }
 
     val voiceType: Flow<String> = context.dataStore.data.map { prefs ->
-        prefs[Keys.VOICE_TYPE] ?: "nam-bac"
+        prefs[Keys.VOICE_TYPE] ?: "valtec-sf"
     }
 
     val voiceCloningEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->

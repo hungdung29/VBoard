@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -12,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.vboard.aac.R
+import com.vboard.aac.data.local.datastore.AppPreferencesDataStore
 import com.vboard.aac.databinding.ActivityMainBinding
 import com.vboard.aac.databinding.ItemCategoryChipBinding
 import com.vboard.aac.databinding.ItemWordChipBinding
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var hapticManager: HapticFeedbackManager
 
+    @Inject
+    lateinit var preferencesDataStore: AppPreferencesDataStore
+
     private lateinit var vocabAdapter: VocabGridAdapter
 
     private var lastCategories: List<Category> = emptyList()
@@ -47,6 +52,7 @@ class MainActivity : AppCompatActivity() {
         setupAdapters()
         setupListeners()
         observeState()
+        maybeShowPinGuidance(savedInstanceState)
     }
 
     private fun setupAdapters() {
@@ -155,6 +161,26 @@ class MainActivity : AppCompatActivity() {
                 viewModel.removeWordAt(index)
             }
             binding.wordsContainer.addView(chipBinding.root)
+        }
+    }
+
+    private fun maybeShowPinGuidance(savedInstanceState: Bundle?) {
+        if (savedInstanceState != null) return
+        lifecycleScope.launch {
+            if (!preferencesDataStore.isOnboardingCompleted()) {
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle(R.string.onboarding_pin_title)
+                    .setMessage(R.string.onboarding_pin_message)
+                    .setPositiveButton(R.string.action_done) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .setOnDismissListener {
+                        lifecycleScope.launch {
+                            preferencesDataStore.setOnboardingCompleted()
+                        }
+                    }
+                    .show()
+            }
         }
     }
 }

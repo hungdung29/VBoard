@@ -19,7 +19,7 @@ import com.vboard.aac.data.local.db.entity.WordUsageEntity
         DailyStatsEntity::class,
         VoiceProfileEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 abstract class VBoardDatabase : RoomDatabase() {

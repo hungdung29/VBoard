@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vboard.aac.domain.repository.ISettingsRepository
 import com.vboard.aac.platform.tts.TextToSpeechManager
+import com.vboard.aac.platform.tts.ValtecTtsEngine
 import com.vboard.aac.platform.voice.InferenceMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +26,7 @@ class VoiceSettingsViewModel @Inject constructor(
         val inferenceMode: InferenceMode = InferenceMode.LITE_PIPER,
         val isVoiceCloningSupported: Boolean = true,
         val voiceVolume: Float = 1.0f,
-        val voiceType: String = "nam-bac"
+        val voiceType: String = ValtecTtsEngine.VOICE_SF
     )
 
     val uiState: StateFlow<VoiceSettingsUiState> = combine(
@@ -44,7 +45,11 @@ class VoiceSettingsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1.0f)
 
     val voiceType = settingsRepo.voiceType
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "nam-bac")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ValtecTtsEngine.VOICE_SF)
+
+    init {
+        ttsManager.preloadValtec()
+    }
 
     fun setVoiceVolume(volume: Float) {
         viewModelScope.launch {
@@ -59,12 +64,16 @@ class VoiceSettingsViewModel @Inject constructor(
     }
 
     fun preview() {
-        ttsManager.preview("Con muốn uống nước")
+        ttsManager.preview(PREVIEW_TEXT, voiceType.value)
     }
 
     fun setVoiceCloningEnabled(enabled: Boolean) {
         viewModelScope.launch {
             settingsRepo.setVoiceCloningEnabled(enabled)
         }
+    }
+
+    private companion object {
+        private const val PREVIEW_TEXT = "Con mu\u1ed1n u\u1ed1ng n\u01b0\u1edbc"
     }
 }

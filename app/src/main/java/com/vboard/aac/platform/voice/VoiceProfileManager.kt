@@ -20,6 +20,75 @@ class VoiceProfileManager @Inject constructor(
     private val voiceProfileRepository: IVoiceProfileRepository,
     private val audioQualityAnalyzer: AudioQualityAnalyzer
 ) {
+    fun startRecording(name: String): Result<Unit> {
+        if (!voiceRecordingManager.hasRecordPermission()) {
+            return Result.failure(Exception("Microphone permission required"))
+        }
+        return voiceRecordingManager.startRecording(name).map { }
+    }
+
+    fun stopRecording(): Result<RecordingResult> {
+        return voiceRecordingManager.stopRecording()
+    }
+
+    fun cancelRecording() {
+        voiceRecordingManager.cancelRecording()
+    }
+
+    fun getCurrentAmplitude(): Float {
+        return voiceRecordingManager.getCurrentAmplitude()
+    }
+
+    suspend fun saveRecordingAsProfile(
+        name: String,
+        recording: RecordingResult,
+        onProgress: ((Int) -> Unit)? = null
+    ): Result<VoiceProfile> = withContext(Dispatchers.IO) {
+        try {
+            if (!recording.isValid) {
+                return@withContext Result.failure(
+                    Exception("Recording quality is not good enough. Please record again.")
+                )
+            }
+
+            onProgress?.invoke(20)
+
+            if (!valtecTtsEngine.isReady()) {
+                valtecTtsEngine.initialize()
+            }
+            val embedding = valtecTtsEngine.extractSpeakerEmbedding(recording.filePath)
+
+            onProgress?.invoke(60)
+
+            val profileId = UUID.randomUUID().toString()
+            val persistentPath = voiceRecordingManager.copyToPersistentStorage(
+                recording.filePath,
+                profileId
+            )
+
+            onProgress?.invoke(80)
+
+            voiceProfileRepository.getAllProfiles().forEach { profile ->
+                voiceProfileRepository.setActiveProfile(profile.id, false)
+            }
+
+            val profile = VoiceProfile(
+                id = profileId,
+                name = name,
+                createdAt = System.currentTimeMillis(),
+                referenceAudioPath = persistentPath,
+                speakerEmbedding = embedding,
+                isActive = true
+            )
+
+            voiceProfileRepository.saveProfile(profile).getOrThrow()
+            onProgress?.invoke(100)
+            Result.success(profile)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     /**
      * Record voice and create a voice profile
      *
@@ -66,17 +135,9 @@ class VoiceProfileManager @Inject constructor(
 
             // Step 5: Extract speaker embedding
             if (!valtecTtsEngine.isReady()) {
-                // Engine not initialized - save profile without embedding for now
-                // Embedding will be extracted when engine is ready
-                return@withContext saveProfileWithoutEmbedding(name, recording)
+                valtecTtsEngine.initialize()
             }
-
-            val embedding = try {
-                valtecTtsEngine.extractSpeakerEmbedding(recording.filePath)
-            } catch (e: Exception) {
-                // Failed to extract embedding
-                return@withContext saveProfileWithoutEmbedding(name, recording)
-            }
+            val embedding = valtecTtsEngine.extractSpeakerEmbedding(recording.filePath)
 
             onProgress?.invoke(70)
 
@@ -125,17 +186,20 @@ class VoiceProfileManager @Inject constructor(
             profileId
         )
 
-        // Create profile with empty embedding
+        voiceProfileRepository.getAllProfiles().forEach { profile ->
+            voiceProfileRepository.setActiveProfile(profile.id, false)
+        }
+
         val profile = VoiceProfile(
             id = profileId,
             name = name,
             createdAt = System.currentTimeMillis(),
             referenceAudioPath = persistentPath,
-            speakerEmbedding = FloatArray(512) { 0f },
+            speakerEmbedding = FloatArray(VoiceProfile.SPEAKER_EMBEDDING_DIM) { 0f },
             isActive = true
         )
 
-        voiceProfileRepository.saveProfile(profile)
+        voiceProfileRepository.saveProfile(profile).getOrThrow()
         Result.success(profile)
     }
 

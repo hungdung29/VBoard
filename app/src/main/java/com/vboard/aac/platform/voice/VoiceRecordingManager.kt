@@ -7,7 +7,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,6 +28,7 @@ class VoiceRecordingManager @Inject constructor(
     private var mediaRecorder: MediaRecorder? = null
     private var outputFile: File? = null
     private var recordingStartTime: Long = 0
+    private var maxAmplitudeSeen: Float = 0f
 
     /**
      * Check if app has microphone permission
@@ -68,6 +68,7 @@ class VoiceRecordingManager @Inject constructor(
             }
 
             recordingStartTime = System.currentTimeMillis()
+            maxAmplitudeSeen = 0f
             Result.success(outputFile!!.absolutePath)
 
         } catch (e: Exception) {
@@ -84,6 +85,8 @@ class VoiceRecordingManager @Inject constructor(
         return try {
             val duration = System.currentTimeMillis() - recordingStartTime
 
+            val amplitude = getCurrentAmplitude().coerceAtLeast(maxAmplitudeSeen)
+
             mediaRecorder?.apply {
                 stop()
                 release()
@@ -97,8 +100,6 @@ class VoiceRecordingManager @Inject constructor(
                 file.delete()
                 return Result.failure(Exception("Recording too short"))
             }
-
-            val amplitude = getMaxAmplitude()
 
             Result.success(
                 RecordingResult(
@@ -132,6 +133,7 @@ class VoiceRecordingManager @Inject constructor(
         mediaRecorder = null
         outputFile?.delete()
         outputFile = null
+        maxAmplitudeSeen = 0f
     }
 
     /**
@@ -140,7 +142,11 @@ class VoiceRecordingManager @Inject constructor(
     fun getCurrentAmplitude(): Float {
         return try {
             val maxAmp = mediaRecorder?.maxAmplitude ?: 0
-            (maxAmp / 32767f).coerceIn(0f, 1f)
+            val current = (maxAmp / 32767f).coerceIn(0f, 1f)
+            if (current > maxAmplitudeSeen) {
+                maxAmplitudeSeen = current
+            }
+            current
         } catch (e: Exception) {
             0f
         }
@@ -150,9 +156,7 @@ class VoiceRecordingManager @Inject constructor(
      * Get max amplitude during recording
      */
     private fun getMaxAmplitude(): Float {
-        // For simplicity, return current amplitude
-        // In production, track max during recording
-        return getCurrentAmplitude()
+        return maxAmplitudeSeen.coerceAtLeast(getCurrentAmplitude())
     }
 
     /**

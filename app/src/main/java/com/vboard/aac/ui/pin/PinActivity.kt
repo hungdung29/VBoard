@@ -81,6 +81,7 @@ class PinActivity : AppCompatActivity() {
                     }
 
                     // Error state
+                    binding.pinErrorText.visibility = if (state.isError) View.VISIBLE else View.GONE
                     if (state.isError) {
                         hapticManager.error()
                         dots.forEach { dot ->

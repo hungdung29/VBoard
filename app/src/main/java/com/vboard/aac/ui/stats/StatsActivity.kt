@@ -1,23 +1,24 @@
 package com.vboard.aac.ui.stats
 
 import android.os.Bundle
-import android.view.View
-import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.vboard.aac.R
 import com.vboard.aac.databinding.ActivityStatsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 class StatsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStatsBinding
     private val viewModel: StatsViewModel by viewModels()
+    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,31 +51,48 @@ class StatsActivity : AppCompatActivity() {
                         "${state.topWords[2].word} (${state.topWords[2].count})"
                     } else ""
 
-                    // Weekly chart - simple bar representation
+                    // Weekly chart - 7 days (oldest -> newest)
+                    val bars = listOf(
+                        binding.chartBar1,
+                        binding.chartBar2,
+                        binding.chartBar3,
+                        binding.chartBar4,
+                        binding.chartBar5,
+                        binding.chartBar6,
+                        binding.chartBar7
+                    )
+                    val labels = listOf(
+                        binding.label1,
+                        binding.label2,
+                        binding.label3,
+                        binding.label4,
+                        binding.label5,
+                        binding.label6,
+                        binding.label7
+                    )
+
                     val maxCount = state.weeklyStats.maxOfOrNull { it.sentencesCount } ?: 1
-                    binding.chartBar1.apply {
-                        val params = layoutParams
-                        params.height = if (maxCount > 0) {
-                            (state.weeklyStats.getOrNull(0)?.sentencesCount ?: 0) * 80 / maxCount
+                    state.weeklyStats.forEachIndexed { index, stat ->
+                        val height = if (maxCount > 0) {
+                            (stat.sentencesCount * 80 / maxCount).coerceAtLeast(4)
                         } else 4
-                        layoutParams = params
-                    }
-                    binding.chartBar2.apply {
-                        val params = layoutParams
-                        params.height = if (maxCount > 0) {
-                            (state.weeklyStats.getOrNull(1)?.sentencesCount ?: 0) * 80 / maxCount
-                        } else 4
-                        layoutParams = params
-                    }
-                    binding.chartBar3.apply {
-                        val params = layoutParams
-                        params.height = if (maxCount > 0) {
-                            (state.weeklyStats.getOrNull(2)?.sentencesCount ?: 0) * 80 / maxCount
-                        } else 4
-                        layoutParams = params
+                        bars.getOrNull(index)?.let { bar ->
+                            val params = bar.layoutParams
+                            params.height = height
+                            bar.layoutParams = params
+                        }
+                        labels.getOrNull(index)?.text = toWeekLabel(stat.date)
                     }
                 }
             }
+        }
+    }
+
+    private fun toWeekLabel(date: String): String {
+        val parsed = LocalDate.parse(date, dateFormatter)
+        return when (parsed.dayOfWeek) {
+            DayOfWeek.SUNDAY -> "CN"
+            else -> "T${parsed.dayOfWeek.value + 1}"
         }
     }
 }

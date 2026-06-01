@@ -90,3 +90,6 @@ build/outputs/
 
 # Local configuration (contains keystore path, passwords, etc.)
 gradle.properties.local
+
+# ONNX models (download from Valtec-TTS repo)
+app/src/main/assets/valtec/*.onnx

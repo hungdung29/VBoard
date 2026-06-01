@@ -13,12 +13,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
+import javax.inject.Provider
 
 data class BoardUiState(
     val cards: List<VocabCard> = emptyList(),
@@ -44,11 +44,12 @@ class BoardViewModel @Inject constructor(
     private val vocabRepo: IVocabRepository,
     private val settingsRepo: ISettingsRepository,
     private val statsRepo: IStatsRepository,
-    private val ttsManager: TextToSpeechManager
+    private val ttsManagerProvider: Provider<TextToSpeechManager>
 ) : ViewModel() {
 
     private val _sentenceItems = MutableStateFlow<List<SentenceItem>>(emptyList())
     private val _activeCategoryId = MutableStateFlow<String?>(null)
+    private var ttsPreloadRequested = false
 
     val uiState: StateFlow<BoardUiState> = combine(
         combine(
@@ -60,9 +61,8 @@ class BoardViewModel @Inject constructor(
         ) { cards, categories, sentences, activeCat, gridColumns ->
             CombinedFlow(cards, categories, sentences, activeCat, gridColumns)
         },
-        settingsRepo.showLabels,
-        ttsManager.isReady
-    ) { combined, showLabels, ttsReady ->
+        settingsRepo.showLabels
+    ) { combined, showLabels ->
         val (cards, categories, sentences, activeCat, gridColumns) = combined
         val filteredCards = if (activeCat == null) {
             cards
@@ -76,7 +76,7 @@ class BoardViewModel @Inject constructor(
             activeCategoryId = activeCat,
             gridColumns = gridColumns,
             showLabels = showLabels,
-            ttsReady = ttsReady,
+            ttsReady = true,
             placeholderVisible = sentences.isEmpty()
         )
     }.stateIn(
@@ -96,6 +96,8 @@ class BoardViewModel @Inject constructor(
     }
 
     fun addWordToSentence(card: VocabCard) {
+        preloadTtsAfterFirstInteraction()
+
         val item = SentenceItem(
             id = UUID.randomUUID().toString(),
             word = card.word,
@@ -124,7 +126,7 @@ class BoardViewModel @Inject constructor(
         if (words.isEmpty()) return
 
         val text = words.joinToString(" ") { it.word }
-        ttsManager.speak(text) {
+        ttsManagerProvider.get().speak(text) {
             viewModelScope.launch {
                 statsRepo.recordSentence()
             }
@@ -137,5 +139,11 @@ class BoardViewModel @Inject constructor(
             current.removeAt(index)
             _sentenceItems.value = current
         }
+    }
+
+    private fun preloadTtsAfterFirstInteraction() {
+        if (ttsPreloadRequested) return
+        ttsPreloadRequested = true
+        ttsManagerProvider.get().preloadValtec()
     }
 }

@@ -5,12 +5,15 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,6 +24,10 @@ import com.vboard.aac.domain.model.VocabCard
 import com.vboard.aac.ui.main.VocabGridAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @AndroidEntryPoint
 class EditActivity : AppCompatActivity() {
@@ -38,10 +45,29 @@ class EditActivity : AppCompatActivity() {
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { pendingImageUri = it }
+        uri?.let {
+            pendingImageUri = it
+            pendingImagePreview?.setImageURI(it)
+            pendingImagePreview?.visibility = android.view.View.VISIBLE
+            pendingImagePlaceholder?.visibility = android.view.View.GONE
+        }
+    }
+
+    private val takePictureLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && pendingImageUri != null) {
+            pendingImagePreview?.setImageURI(pendingImageUri)
+            pendingImagePreview?.visibility = android.view.View.VISIBLE
+            pendingImagePlaceholder?.visibility = android.view.View.GONE
+        } else {
+            pendingImageUri = null
+        }
     }
 
     private var pendingImageUri: Uri? = null
+    private var pendingImagePreview: ImageView? = null
+    private var pendingImagePlaceholder: android.view.View? = null
     private var editingCard: VocabCard? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -106,35 +132,76 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun showAddDialog() {
+        pendingImageUri = null
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_card, null)
+        val takePhoto = dialogView.findViewById<android.view.View>(R.id.btnTakePhoto)
+        val pickGallery = dialogView.findViewById<android.view.View>(R.id.btnPickGallery)
+        val imageContainer = dialogView.findViewById<android.view.View>(R.id.imageContainer)
+        val imagePreview = dialogView.findViewById<ImageView>(R.id.selectedImage)
+        val imagePlaceholder = dialogView.findViewById<android.view.View>(R.id.imagePlaceholder)
+        pendingImagePreview = imagePreview
+        pendingImagePlaceholder = imagePlaceholder
+        takePhoto.setOnClickListener { openCamera() }
+        pickGallery.setOnClickListener { pickImageLauncher.launch("image/*") }
+        imageContainer.setOnClickListener { pickImageLauncher.launch("image/*") }
+
         AlertDialog.Builder(this)
             .setTitle("Thêm thẻ mới")
             .setView(dialogView)
             .setPositiveButton("Lưu") { _, _ ->
                 val word = dialogView.findViewById<android.widget.EditText>(R.id.editWord).text.toString()
                 if (word.isNotBlank()) {
-                    viewModel.addCard(word, "cat-1", null)
+                    viewModel.addCard(word, "cat-1", pendingImageUri?.toString())
                 }
             }
             .setNegativeButton("Hủy", null)
+            .setOnDismissListener {
+                pendingImageUri = null
+                pendingImagePreview = null
+                pendingImagePlaceholder = null
+            }
             .show()
     }
 
     private fun showEditDialog(card: VocabCard) {
         editingCard = card
+        pendingImageUri = null
         val dialogView = layoutInflater.inflate(R.layout.dialog_add_card, null)
         val editText = dialogView.findViewById<android.widget.EditText>(R.id.editWord)
+        val takePhoto = dialogView.findViewById<android.view.View>(R.id.btnTakePhoto)
+        val pickGallery = dialogView.findViewById<android.view.View>(R.id.btnPickGallery)
+        val imageContainer = dialogView.findViewById<android.view.View>(R.id.imageContainer)
+        val imagePreview = dialogView.findViewById<ImageView>(R.id.selectedImage)
+        val imagePlaceholder = dialogView.findViewById<android.view.View>(R.id.imagePlaceholder)
+        pendingImagePreview = imagePreview
+        pendingImagePlaceholder = imagePlaceholder
+        takePhoto.setOnClickListener { openCamera() }
+        pickGallery.setOnClickListener { pickImageLauncher.launch("image/*") }
+        imageContainer.setOnClickListener { pickImageLauncher.launch("image/*") }
         editText.setText(card.word)
+
+        card.localImagePath?.let { path ->
+            val uri = Uri.parse(path)
+            imagePreview.setImageURI(uri)
+            imagePreview.visibility = android.view.View.VISIBLE
+            imagePlaceholder.visibility = android.view.View.GONE
+        }
+
         AlertDialog.Builder(this)
             .setTitle("Sửa thẻ")
             .setView(dialogView)
             .setPositiveButton("Lưu") { _, _ ->
                 val word = editText.text.toString()
                 if (word.isNotBlank()) {
-                    viewModel.updateCard(card.id, word, card.categoryId, null)
+                    viewModel.updateCard(card.id, word, card.categoryId, pendingImageUri?.toString())
                 }
             }
             .setNegativeButton("Hủy", null)
+            .setOnDismissListener {
+                pendingImageUri = null
+                pendingImagePreview = null
+                pendingImagePlaceholder = null
+            }
             .show()
     }
 
@@ -174,7 +241,29 @@ class EditActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
-        // CameraX integration would go here
-        pickImageLauncher.launch("image/*")
+        val permissionGranted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!permissionGranted) {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+
+        val photoFile = createTempImageFile()
+        val photoUri = FileProvider.getUriForFile(
+            this,
+            "${packageName}.fileprovider",
+            photoFile
+        )
+        pendingImageUri = photoUri
+        takePictureLauncher.launch(photoUri)
+    }
+
+    private fun createTempImageFile(): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+            ?: File(cacheDir, "images").apply { mkdirs() }
+        return File.createTempFile("VBOARD_${timeStamp}_", ".jpg", storageDir)
     }
 }

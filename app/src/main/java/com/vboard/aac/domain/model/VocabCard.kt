@@ -42,7 +42,7 @@ data class AppSettings(
     val gridColumns: Int = 3,
     val showLabels: Boolean = true,
     val fontScale: Float = 1.0f,
-    val pinCode: String = "1234",
+    val pinCode: String = "1973",
     val voiceVolume: Float = 1.0f,
     val voiceType: String = "nam-bac"
 )

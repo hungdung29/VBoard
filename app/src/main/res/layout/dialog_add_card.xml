@@ -5,7 +5,65 @@
     android:orientation="vertical"
     android:padding="24dp">
 
-    <!-- Image capture area -->
+    <!-- Image options -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/btnTakePhoto"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_emoji_container"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_camera"
+                android:contentDescription="@string/add_card_take_photo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/add_card_take_photo"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnPickGallery"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_emoji_container"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@android:drawable/ic_menu_gallery"
+                android:contentDescription="@string/add_card_pick_gallery" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/add_card_pick_gallery"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="14sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Image preview -->
     <FrameLayout
         android:id="@+id/imageContainer"
         android:layout_width="match_parent"
@@ -13,7 +71,16 @@
         android:background="@drawable/bg_emoji_container"
         android:layout_marginBottom="16dp">
 
+        <ImageView
+            android:id="@+id/selectedImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/add_card_tap_image"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
         <LinearLayout
+            android:id="@+id/imagePlaceholder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -23,14 +90,14 @@
             <ImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_camera"
-                android:contentDescription="Chụp ảnh" />
+                android:src="@android:drawable/ic_menu_gallery"
+                android:contentDescription="@string/add_card_tap_image" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Chạm để chụp ảnh"
+                android:text="@string/add_card_tap_image"
                 android:textColor="@color/on_surface_variant"
                 android:textSize="14sp" />
         </LinearLayout>
