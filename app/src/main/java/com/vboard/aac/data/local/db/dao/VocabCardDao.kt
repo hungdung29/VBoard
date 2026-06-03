@@ -39,6 +39,9 @@ interface VocabCardDao {
     @Query("SELECT COUNT(*) FROM vocab_cards")
     suspend fun getCardCount(): Int
 
+    @Query("UPDATE vocab_cards SET display_order = display_order + 1 WHERE display_order >= :fromOrder")
+    suspend fun shiftDisplayOrdersFrom(fromOrder: Int)
+
     @Query("DELETE FROM vocab_cards WHERE is_custom = 0")
     suspend fun deleteDefaultCards()
 

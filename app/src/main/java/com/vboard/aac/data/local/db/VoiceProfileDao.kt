@@ -13,7 +13,7 @@ interface VoiceProfileDao {
     suspend fun getActiveProfile(): VoiceProfileEntity?
 
     @Query("SELECT * FROM voice_profiles ORDER BY created_at DESC")
-    fun getAllProfiles(): Flow<List<VoiceProfileEntity>>
+    suspend fun getAllProfiles(): List<VoiceProfileEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(profile: VoiceProfileEntity)

@@ -14,8 +14,10 @@ import android.util.Log
 import com.vboard.aac.domain.repository.IVoiceProfileRepository
 import com.vboard.aac.domain.repository.ISettingsRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -34,7 +36,8 @@ class TextToSpeechManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val settingsRepository: ISettingsRepository,
     private val voiceProfileRepository: IVoiceProfileRepository,
-    private val valtecTtsEngine: ValtecTtsEngine
+    private val valtecTtsEngine: ValtecTtsEngine,
+    private val vieneuCloneClient: VieneuCloneClient
 ) : TextToSpeech.OnInitListener {
 
     private companion object {
@@ -45,6 +48,9 @@ class TextToSpeechManager @Inject constructor(
     private var tts: TextToSpeech? = null
     private var valtecAudioTrack: AudioTrack? = null
     private var presetPreviewPlayer: MediaPlayer? = null
+    private var vieneuClonePlayer: MediaPlayer? = null
+    private val playerLock = Any()
+    private var speakJob: Job? = null
     private val _isReady = MutableStateFlow(false)
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
 
@@ -56,6 +62,13 @@ class TextToSpeechManager @Inject constructor(
     private val valtecAudioCache = object : LinkedHashMap<String, FloatArray>(MAX_AUDIO_CACHE_ENTRIES, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, FloatArray>?): Boolean {
             return size > MAX_AUDIO_CACHE_ENTRIES
+        }
+    }
+    private val vieneuAudioCache = object : LinkedHashMap<String, File>(MAX_AUDIO_CACHE_ENTRIES, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, File>?): Boolean {
+            val shouldRemove = size > MAX_AUDIO_CACHE_ENTRIES
+            if (shouldRemove) eldest?.value?.delete()
+            return shouldRemove
         }
     }
 
@@ -89,8 +102,13 @@ class TextToSpeechManager @Inject constructor(
     fun speak(text: String, onComplete: (() -> Unit)? = null) {
         if (text.isBlank()) return
 
-        scope.launch {
-            val spokeWithValtec = speakWithValtecIfAvailable(text, onComplete)
+        speakJob?.cancel()
+        stop()
+        speakJob = scope.launch {
+            val spokeWithVieneu = speakWithVieneuCloneIfAvailable(text, onComplete)
+            if (spokeWithVieneu) return@launch
+
+            val spokeWithValtec = speakWithValtecPresetIfAvailable(text, onComplete)
             if (!spokeWithValtec) {
                 speakWithSystemTts(text, onComplete)
             }
@@ -133,9 +151,18 @@ class TextToSpeechManager @Inject constructor(
         }
     }
 
+    suspend fun generateVieneuClonePreview(text: String): Result<Unit> = runCatching {
+        require(text.isNotBlank()) { "Preview text is required" }
+        getOrSynthesizeVieneuCloneAudio(text)
+    }.map { }
+
+    suspend fun playVieneuClonePreview(text: String): Result<Unit> = runCatching {
+        require(text.isNotBlank()) { "Preview text is required" }
+        playVieneuAudio(getOrSynthesizeVieneuCloneAudio(text))
+    }
+
     private suspend fun playPresetPreview(assetPath: String): Boolean = withContext(Dispatchers.IO) {
         try {
-            releasePresetPreviewPlayer()
             val cacheFile = File(context.cacheDir, File(assetPath).name)
             if (!cacheFile.exists() || cacheFile.length() == 0L) {
                 context.assets.open(assetPath).use { input ->
@@ -146,25 +173,30 @@ class TextToSpeechManager @Inject constructor(
             }
 
             val volume = settingsRepository.voiceVolume.first()
-            val player = MediaPlayer().apply {
-                setAudioAttributes(
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                        .build()
-                )
-                setDataSource(cacheFile.absolutePath)
-                setVolume(volume, volume)
-                prepare()
-                setOnCompletionListener { completedPlayer ->
-                    completedPlayer.release()
-                    if (presetPreviewPlayer === completedPlayer) {
-                        presetPreviewPlayer = null
+            synchronized(playerLock) {
+                releasePresetPreviewPlayer()
+                val player = MediaPlayer().apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build()
+                    )
+                    setDataSource(cacheFile.absolutePath)
+                    setVolume(volume, volume)
+                    prepare()
+                    setOnCompletionListener { completedPlayer ->
+                        synchronized(playerLock) {
+                            completedPlayer.release()
+                            if (presetPreviewPlayer === completedPlayer) {
+                                presetPreviewPlayer = null
+                            }
+                        }
                     }
+                    start()
                 }
-                start()
+                presetPreviewPlayer = player
             }
-            presetPreviewPlayer = player
             true
         } catch (e: Exception) {
             Log.e(TAG, "Preset preview failed for asset=$assetPath", e)
@@ -181,21 +213,52 @@ class TextToSpeechManager @Inject constructor(
         else -> null
     }
 
-    private suspend fun speakWithValtecIfAvailable(
+    private suspend fun speakWithVieneuCloneIfAvailable(
+        text: String,
+        onComplete: (() -> Unit)?
+    ): Boolean {
+        if (!settingsRepository.voiceCloningEnabled.first()) return false
+
+        return try {
+            playVieneuAudio(getOrSynthesizeVieneuCloneAudio(text))
+            onComplete?.invoke()
+            true
+        } catch (e: Exception) {
+            Log.e(TAG, "VieNeu cloning failed; falling back to Valtec preset", e)
+            false
+        }
+    }
+
+    private suspend fun getOrSynthesizeVieneuCloneAudio(text: String): File {
+        val activeProfile = voiceProfileRepository.getActiveProfile()
+            ?: error("No active cloned voice profile")
+        val referenceAudioPath = activeProfile.referenceAudioPath
+            ?: error("Cloned voice reference audio is missing")
+        val referenceAudio = File(referenceAudioPath)
+        require(referenceAudio.isFile) { "Cloned voice reference audio is missing" }
+
+        val serverUrl = settingsRepository.vieneuServerUrl.first()
+        val cacheKey = "vieneu|$serverUrl|${activeProfile.id}|${text.trim().lowercase()}"
+        return synchronized(vieneuAudioCache) {
+            vieneuAudioCache[cacheKey]
+        } ?: vieneuCloneClient.synthesize(
+            serverUrl = serverUrl,
+            text = text,
+            referenceAudio = referenceAudio
+        ).also { generatedFile ->
+            synchronized(vieneuAudioCache) {
+                vieneuAudioCache[cacheKey] = generatedFile
+            }
+        }
+    }
+
+    private suspend fun speakWithValtecPresetIfAvailable(
         text: String,
         onComplete: (() -> Unit)?
     ): Boolean {
         val voiceType = settingsRepository.voiceType.first()
-        val presetSpeakerId = ValtecTtsEngine.speakerIdForVoiceType(voiceType)
-        val speakerEmbedding = if (presetSpeakerId != null) {
-            valtecTtsEngine.createSpeakerEmbedding(presetSpeakerId)
-        } else {
-            val voiceCloningEnabled = settingsRepository.voiceCloningEnabled.first()
-            if (!voiceCloningEnabled) return false
-            val activeProfile = voiceProfileRepository.getActiveProfile() ?: return false
-            if (activeProfile.speakerEmbedding.isEmpty()) return false
-            activeProfile.speakerEmbedding
-        }
+        val presetSpeakerId = ValtecTtsEngine.speakerIdForVoiceType(voiceType) ?: return false
+        val speakerEmbedding = valtecTtsEngine.createSpeakerEmbedding(presetSpeakerId)
 
         return try {
             if (!valtecTtsEngine.isReady()) {
@@ -252,45 +315,97 @@ class TextToSpeechManager @Inject constructor(
     private suspend fun playValtecAudio(audio: FloatArray) = withContext(Dispatchers.IO) {
         if (audio.isEmpty()) return@withContext
 
-        releaseValtecAudioTrack()
-        val pcm = ShortArray(audio.size) { index ->
-            (audio[index].coerceIn(-1f, 1f) * Short.MAX_VALUE).toInt().toShort()
+        val volume = settingsRepository.voiceVolume.first()
+        var track: AudioTrack? = null
+        try {
+            synchronized(playerLock) {
+                releaseValtecAudioTrack()
+                val pcm = ShortArray(audio.size) { index ->
+                    (audio[index].coerceIn(-1f, 1f) * Short.MAX_VALUE).toInt().toShort()
+                }
+                val bufferSizeBytes = pcm.size * 2
+
+                val newTrack = AudioTrack.Builder()
+                    .setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build()
+                    )
+                    .setAudioFormat(
+                        AudioFormat.Builder()
+                            .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+                            .setSampleRate(ValtecTtsEngine.SAMPLE_RATE)
+                            .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
+                            .build()
+                    )
+                    .setBufferSizeInBytes(bufferSizeBytes)
+                    .setTransferMode(AudioTrack.MODE_STATIC)
+                    .setSessionId(AudioManager.AUDIO_SESSION_ID_GENERATE)
+                    .build()
+
+                track = newTrack
+                valtecAudioTrack = newTrack
+                newTrack.setVolume(volume)
+                newTrack.write(pcm, 0, pcm.size)
+                newTrack.play()
+            }
+
+            val durationMs = (audio.size * 1000L / ValtecTtsEngine.SAMPLE_RATE).coerceAtLeast(100L)
+            delay(durationMs + 50L)
+        } finally {
+            synchronized(playerLock) {
+                if (valtecAudioTrack === track && track != null) {
+                    releaseValtecAudioTrack()
+                }
+            }
         }
-        val bufferSizeBytes = pcm.size * 2
+    }
 
-        val track = AudioTrack.Builder()
-            .setAudioAttributes(
-                AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                    .build()
-            )
-            .setAudioFormat(
-                AudioFormat.Builder()
-                    .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
-                    .setSampleRate(ValtecTtsEngine.SAMPLE_RATE)
-                    .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
-                    .build()
-            )
-            .setBufferSizeInBytes(bufferSizeBytes)
-            .setTransferMode(AudioTrack.MODE_STATIC)
-            .setSessionId(AudioManager.AUDIO_SESSION_ID_GENERATE)
-            .build()
-
-        valtecAudioTrack = track
-        track.setVolume(settingsRepository.voiceVolume.first())
-        track.write(pcm, 0, pcm.size)
-        track.play()
-
-        val durationMs = (audio.size * 1000L / ValtecTtsEngine.SAMPLE_RATE).coerceAtLeast(100L)
-        delay(durationMs + 50L)
-        releaseValtecAudioTrack()
+    private suspend fun playVieneuAudio(audioFile: File) = withContext(Dispatchers.IO) {
+        val volume = settingsRepository.voiceVolume.first()
+        var player: MediaPlayer? = null
+        val playCompletion = CompletableDeferred<Unit>()
+        try {
+            synchronized(playerLock) {
+                releaseVieneuClonePlayer()
+                val newPlayer = MediaPlayer().apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build()
+                    )
+                    setDataSource(audioFile.absolutePath)
+                    setVolume(volume, volume)
+                    setOnCompletionListener {
+                        playCompletion.complete(Unit)
+                    }
+                    setOnErrorListener { _, _, _ ->
+                        playCompletion.complete(Unit)
+                        false
+                    }
+                    prepare()
+                    start()
+                }
+                player = newPlayer
+                vieneuClonePlayer = newPlayer
+            }
+            playCompletion.await()
+        } finally {
+            synchronized(playerLock) {
+                if (vieneuClonePlayer === player && player != null) {
+                    releaseVieneuClonePlayer()
+                }
+            }
+        }
     }
 
     fun stop() {
         tts?.stop()
         releaseValtecAudioTrack()
         releasePresetPreviewPlayer()
+        releaseVieneuClonePlayer()
     }
 
     fun setSpeechRate(rate: Float) {
@@ -307,10 +422,17 @@ class TextToSpeechManager @Inject constructor(
     }
 
     fun shutdown() {
+        speakJob?.cancel()
+        speakJob = null
         tts?.stop()
         tts?.shutdown()
         releaseValtecAudioTrack()
         releasePresetPreviewPlayer()
+        releaseVieneuClonePlayer()
+        synchronized(vieneuAudioCache) {
+            vieneuAudioCache.values.forEach { it.delete() }
+            vieneuAudioCache.clear()
+        }
         valtecTtsEngine.release()
         tts = null
         _isReady.value = false
@@ -318,23 +440,39 @@ class TextToSpeechManager @Inject constructor(
     }
 
     private fun releaseValtecAudioTrack() {
-        try {
-            valtecAudioTrack?.stop()
-        } catch (e: Exception) {
-            // Ignore stop errors for already released tracks.
+        synchronized(playerLock) {
+            try {
+                valtecAudioTrack?.stop()
+            } catch (e: Exception) {
+                // Ignore stop errors for already released tracks.
+            }
+            valtecAudioTrack?.release()
+            valtecAudioTrack = null
         }
-        valtecAudioTrack?.release()
-        valtecAudioTrack = null
     }
 
     private fun releasePresetPreviewPlayer() {
-        try {
-            presetPreviewPlayer?.stop()
-        } catch (e: Exception) {
-            // Ignore stop errors for already released players.
+        synchronized(playerLock) {
+            try {
+                presetPreviewPlayer?.stop()
+            } catch (e: Exception) {
+                // Ignore stop errors for already released players.
+            }
+            presetPreviewPlayer?.release()
+            presetPreviewPlayer = null
         }
-        presetPreviewPlayer?.release()
-        presetPreviewPlayer = null
+    }
+
+    private fun releaseVieneuClonePlayer() {
+        synchronized(playerLock) {
+            try {
+                vieneuClonePlayer?.stop()
+            } catch (e: Exception) {
+                // Ignore stop errors for already released players.
+            }
+            vieneuClonePlayer?.release()
+            vieneuClonePlayer = null
+        }
     }
 
     private fun ensureSystemTts() {

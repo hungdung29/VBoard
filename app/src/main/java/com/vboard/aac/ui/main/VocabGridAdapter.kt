@@ -1,10 +1,12 @@
 package com.vboard.aac.ui.main
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.vboard.aac.databinding.ItemVocabCardBinding
 import com.vboard.aac.domain.model.VocabCard
 
@@ -51,9 +53,16 @@ class VocabGridAdapter(
                 android.view.View.GONE
             }
 
-            // Emoji fallback map
-            val emoji = EMOJI_MAP[card.word] ?: "📝"
-            binding.emojiText.text = emoji
+            if (!card.localImagePath.isNullOrEmpty()) {
+                binding.cardImage.visibility = android.view.View.VISIBLE
+                binding.emojiText.visibility = android.view.View.GONE
+                binding.cardImage.load(Uri.parse(card.localImagePath))
+            } else {
+                binding.cardImage.visibility = android.view.View.GONE
+                binding.emojiText.visibility = android.view.View.VISIBLE
+                val emoji = EMOJI_MAP[card.word] ?: "📝"
+                binding.emojiText.text = emoji
+            }
 
             // Accessibility
             binding.vocabCard.contentDescription = binding.root.context.getString(
@@ -82,7 +91,7 @@ class VocabGridAdapter(
             "Chơi" to "🎮", "Đồ chơi" to "🧸", "Bóng" to "⚽", "Sách" to "📖",
             "Đi dạo" to "🚶", "Bơi" to "🏊", "Nhảy" to "🕺", "Hát" to "🎵",
             "Vui" to "😊", "Buồn" to "😢", "Sợ" to "😨", "Mệt" to "😫",
-            "Đói" to "😫", "Khát" to "🥤", "Nóng" to "🔥", "Lạnh" to "❄️",
+            "Đói" to "😫", "Khát" to "🥤", "Nóng" to "🔥", "Lạnh" to "❄️", "Đau" to "🤕",
             "Muốn" to "💭", "Cần" to "✋", "Đi" to "🚶", "Ngủ" to "😴",
             "Tắm" to "🚿", "Mặc" to "👕", "Đi học" to "🏫", "Xem" to "👀",
             "Bút" to "✏️", "Giấy" to "📄", "Bảng" to "📋",

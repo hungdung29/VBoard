@@ -3,7 +3,6 @@ package com.vboard.aac.platform.voice
 import com.vboard.aac.domain.model.VoiceProfile
 import com.vboard.aac.domain.repository.IVoiceProfileRepository
 import com.vboard.aac.platform.audio.AudioQualityAnalyzer
-import com.vboard.aac.platform.tts.ValtecTtsEngine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -16,7 +15,6 @@ import javax.inject.Singleton
 @Singleton
 class VoiceProfileManager @Inject constructor(
     private val voiceRecordingManager: VoiceRecordingManager,
-    private val valtecTtsEngine: ValtecTtsEngine,
     private val voiceProfileRepository: IVoiceProfileRepository,
     private val audioQualityAnalyzer: AudioQualityAnalyzer
 ) {
@@ -53,13 +51,6 @@ class VoiceProfileManager @Inject constructor(
 
             onProgress?.invoke(20)
 
-            if (!valtecTtsEngine.isReady()) {
-                valtecTtsEngine.initialize()
-            }
-            val embedding = valtecTtsEngine.extractSpeakerEmbedding(recording.filePath)
-
-            onProgress?.invoke(60)
-
             val profileId = UUID.randomUUID().toString()
             val persistentPath = voiceRecordingManager.copyToPersistentStorage(
                 recording.filePath,
@@ -68,17 +59,16 @@ class VoiceProfileManager @Inject constructor(
 
             onProgress?.invoke(80)
 
-            voiceProfileRepository.getAllProfiles().forEach { profile ->
-                voiceProfileRepository.setActiveProfile(profile.id, false)
-            }
+            voiceProfileRepository.deactivateAll().getOrThrow()
 
             val profile = VoiceProfile(
                 id = profileId,
                 name = name,
                 createdAt = System.currentTimeMillis(),
                 referenceAudioPath = persistentPath,
-                speakerEmbedding = embedding,
-                isActive = true
+                speakerEmbedding = FloatArray(VoiceProfile.SPEAKER_EMBEDDING_DIM),
+                isActive = true,
+                modelVersion = VIENEU_LOCAL_MODEL_VERSION
             )
 
             voiceProfileRepository.saveProfile(profile).getOrThrow()
@@ -112,7 +102,7 @@ class VoiceProfileManager @Inject constructor(
             val recordResult = voiceRecordingManager.startRecording(name)
             recordResult.onFailure { return@withContext Result.failure(it) }
 
-            // Wait for recording to complete (user stops manually or auto-stops at 10s)
+            // Wait for recording to complete (user stops manually or auto-stops at 5s)
             // For now, return success with placeholder
             // In full implementation, this would be a dialog-based flow
 
@@ -133,15 +123,7 @@ class VoiceProfileManager @Inject constructor(
 
             onProgress?.invoke(50)
 
-            // Step 5: Extract speaker embedding
-            if (!valtecTtsEngine.isReady()) {
-                valtecTtsEngine.initialize()
-            }
-            val embedding = valtecTtsEngine.extractSpeakerEmbedding(recording.filePath)
-
-            onProgress?.invoke(70)
-
-            // Step 6: Copy to persistent storage
+            // Step 5: Copy the WAV reference used by the VieNeu local backend.
             val profileId = UUID.randomUUID().toString()
             val persistentPath = voiceRecordingManager.copyToPersistentStorage(
                 recording.filePath,
@@ -150,10 +132,7 @@ class VoiceProfileManager @Inject constructor(
 
             onProgress?.invoke(90)
 
-            // Step 7: Deactivate existing profiles
-            voiceProfileRepository.getAllProfiles().forEach { profile ->
-                voiceProfileRepository.setActiveProfile(profile.id, false)
-            }
+            voiceProfileRepository.deactivateAll()
 
             // Step 8: Save new profile
             val profile = VoiceProfile(
@@ -161,8 +140,9 @@ class VoiceProfileManager @Inject constructor(
                 name = name,
                 createdAt = System.currentTimeMillis(),
                 referenceAudioPath = persistentPath,
-                speakerEmbedding = embedding,
-                isActive = true
+                speakerEmbedding = FloatArray(VoiceProfile.SPEAKER_EMBEDDING_DIM),
+                isActive = true,
+                modelVersion = VIENEU_LOCAL_MODEL_VERSION
             )
 
             voiceProfileRepository.saveProfile(profile)
@@ -232,5 +212,9 @@ class VoiceProfileManager @Inject constructor(
      */
     suspend fun setActiveProfile(profileId: String): Result<Unit> {
         return voiceProfileRepository.setActiveProfile(profileId, true)
+    }
+
+    private companion object {
+        const val VIENEU_LOCAL_MODEL_VERSION = "vieneu-local-v1"
     }
 }

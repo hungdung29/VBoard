@@ -20,13 +20,16 @@ class VoiceSettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityVoiceSettingsBinding
     private val viewModel: VoiceSettingsViewModel by viewModels()
-    private val voicePresets = listOf(
-        VoicePreset("Nu mien Bac (NF)", ValtecTtsEngine.VOICE_NF),
-        VoicePreset("Nu mien Nam (SF)", ValtecTtsEngine.VOICE_SF),
-        VoicePreset("Nam mien Bac 1 (NM1)", ValtecTtsEngine.VOICE_NM1),
-        VoicePreset("Nam mien Nam (SM)", ValtecTtsEngine.VOICE_SM),
-        VoicePreset("Nam mien Bac 2 (NM2)", ValtecTtsEngine.VOICE_NM2)
-    )
+    private val voicePresets by lazy {
+        listOf(
+            VoicePreset(getString(com.vboard.aac.R.string.voice_type_vieneu_cloned), VoiceSettingsViewModel.VOICE_VIENEU_CLONED),
+            VoicePreset("Nữ miền Bắc", ValtecTtsEngine.VOICE_NF),
+            VoicePreset("Nữ miền Nam", ValtecTtsEngine.VOICE_SF),
+            VoicePreset("Nam miền Bắc 1", ValtecTtsEngine.VOICE_NM1),
+            VoicePreset("Nam miền Nam", ValtecTtsEngine.VOICE_SM),
+            VoicePreset("Nam miền Bắc 2", ValtecTtsEngine.VOICE_NM2)
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,9 +91,14 @@ class VoiceSettingsActivity : AppCompatActivity() {
                     }
                 }
                 launch {
-                    viewModel.voiceType.collect { type ->
-                        val preset = voicePresets.firstOrNull { it.value == normalizeVoiceType(type) }
-                            ?: voicePresets[1]
+                    viewModel.uiState.collect { state ->
+                        val selectedVoiceType = if (state.voiceCloningEnabled) {
+                            VoiceSettingsViewModel.VOICE_VIENEU_CLONED
+                        } else {
+                            normalizeVoiceType(state.voiceType)
+                        }
+                        val preset = voicePresets.firstOrNull { it.value == selectedVoiceType }
+                            ?: voicePresets[2]
                         if (binding.voiceTypeDropdown.text.toString() != preset.label) {
                             binding.voiceTypeDropdown.setText(preset.label, false)
                         }

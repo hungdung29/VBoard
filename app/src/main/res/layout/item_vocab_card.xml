@@ -22,23 +22,37 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Image/Emoji Container -->
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:background="@drawable/bg_emoji_container"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/spacing_md"
+            app:cardBackgroundColor="@color/surface_container_low"
+            app:cardCornerRadius="@dimen/radius_xl"
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="false"
+            app:cardUseCompatPadding="false"
             app:layout_constraintBottom_toTopOf="@id/wordLabel"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:id="@+id/emojiText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📝"
-                android:textSize="48sp" />
-        </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/emojiText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="📝"
+                    android:textSize="48sp" />
+
+                <ImageView
+                    android:id="@+id/cardImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
 
         <!-- Word Label -->
         <TextView

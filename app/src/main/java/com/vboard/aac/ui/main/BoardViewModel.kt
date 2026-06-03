@@ -65,7 +65,9 @@ class BoardViewModel @Inject constructor(
     ) { combined, showLabels ->
         val (cards, categories, sentences, activeCat, gridColumns) = combined
         val filteredCards = if (activeCat == null) {
-            cards
+            PRIORITY_CARD_IDS.mapNotNull { cardId ->
+                cards.find { it.id == cardId }
+            } + cards.filterNot { it.id in PRIORITY_CARD_IDS }
         } else {
             cards.filter { it.categoryId == activeCat }
         }
@@ -145,5 +147,9 @@ class BoardViewModel @Inject constructor(
         if (ttsPreloadRequested) return
         ttsPreloadRequested = true
         ttsManagerProvider.get().preloadValtec()
+    }
+
+    private companion object {
+        val PRIORITY_CARD_IDS = listOf("c61", "c38", "c39")
     }
 }

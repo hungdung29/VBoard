@@ -12,6 +12,7 @@ interface ISettingsRepository {
     val voiceVolume: Flow<Float>
     val voiceType: Flow<String>
     val voiceCloningEnabled: Flow<Boolean>
+    val vieneuServerUrl: Flow<String>
     val appSettings: Flow<AppSettings>
 
     suspend fun setDarkMode(enabled: Boolean)

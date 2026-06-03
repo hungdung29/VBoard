@@ -59,12 +59,21 @@ class VoiceSettingsViewModel @Inject constructor(
 
     fun setVoiceType(type: String) {
         viewModelScope.launch {
-            settingsRepo.setVoiceType(type)
+            if (type == VOICE_VIENEU_CLONED) {
+                settingsRepo.setVoiceCloningEnabled(true)
+            } else {
+                settingsRepo.setVoiceType(type)
+                settingsRepo.setVoiceCloningEnabled(false)
+            }
         }
     }
 
     fun preview() {
-        ttsManager.preview(PREVIEW_TEXT, voiceType.value)
+        if (uiState.value.voiceCloningEnabled) {
+            ttsManager.preview(PREVIEW_TEXT)
+        } else {
+            ttsManager.preview(PREVIEW_TEXT, uiState.value.voiceType)
+        }
     }
 
     fun setVoiceCloningEnabled(enabled: Boolean) {
@@ -73,7 +82,8 @@ class VoiceSettingsViewModel @Inject constructor(
         }
     }
 
-    private companion object {
+    companion object {
+        const val VOICE_VIENEU_CLONED = "vieneu-cloned"
         private const val PREVIEW_TEXT = "Con mu\u1ed1n u\u1ed1ng n\u01b0\u1edbc"
     }
 }

@@ -102,13 +102,13 @@ class BackupActivity : AppCompatActivity() {
         binding.statusMessage.text = message
         binding.statusMessage.setTextColor(getColor(R.color.secondary))
         binding.statusMessage.visibility = View.VISIBLE
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        com.vboard.aac.ui.utils.CustomToast.show(this, message)
     }
 
     private fun showError(message: String) {
         binding.statusMessage.text = message
         binding.statusMessage.setTextColor(getColor(R.color.error))
         binding.statusMessage.visibility = View.VISIBLE
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        com.vboard.aac.ui.utils.CustomToast.show(this, message)
     }
 }

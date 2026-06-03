@@ -5,7 +5,6 @@ import com.vboard.aac.data.local.db.entity.toDomain
 import com.vboard.aac.data.local.db.entity.toEntity
 import com.vboard.aac.domain.model.VoiceProfile
 import com.vboard.aac.domain.repository.IVoiceProfileRepository
-import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,7 +22,7 @@ class VoiceProfileRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAllProfiles(): List<VoiceProfile> {
-        return voiceProfileDao.getAllProfiles().first().map { it.toDomain() }
+        return voiceProfileDao.getAllProfiles().map { it.toDomain() }
     }
 
     override suspend fun deleteProfile(id: String): Result<Unit> = runCatching {
@@ -35,6 +34,10 @@ class VoiceProfileRepositoryImpl @Inject constructor(
             voiceProfileDao.deactivateAll()
         }
         voiceProfileDao.activate(id, active)
+    }
+
+    override suspend fun deactivateAll(): Result<Unit> = runCatching {
+        voiceProfileDao.deactivateAll()
     }
 
     override suspend fun hasProfile(): Boolean {

@@ -3,8 +3,10 @@ package com.vboard.aac.ui.voicetest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vboard.aac.domain.repository.ISettingsRepository
+import com.vboard.aac.platform.tts.TextToSpeechManager
 import com.vboard.aac.platform.voice.RecordingResult
 import com.vboard.aac.platform.voice.VoiceProfileManager
+import com.vboard.aac.platform.voice.VoiceRecordingManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -21,21 +23,22 @@ data class VoiceRecordingUiState(
     val recordingState: State = State.IDLE,
     val progress: Int = 0,
     val elapsedSeconds: Int = 0,
-    val targetSeconds: Int = 10
+    val targetSeconds: Int = (VoiceRecordingManager.TARGET_DURATION_MS / 1000).toInt()
 )
 
-enum class State { IDLE, RECORDING, STOPPED, SAVING, SUCCESS, ERROR }
+enum class State { IDLE, RECORDING, STOPPED, SAVING, GENERATING_SAMPLE, PREVIEW_READY, ERROR }
 
 sealed class VoiceRecordingEvent {
-    data object Success : VoiceRecordingEvent()
     data object PermissionDenied : VoiceRecordingEvent()
+    data object PreviewError : VoiceRecordingEvent()
     data class Error(val message: String) : VoiceRecordingEvent()
 }
 
 @HiltViewModel
 class VoiceRecordingViewModel @Inject constructor(
     private val voiceProfileManager: VoiceProfileManager,
-    private val settingsRepository: ISettingsRepository
+    private val settingsRepository: ISettingsRepository,
+    private val ttsManager: TextToSpeechManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(VoiceRecordingUiState())
@@ -60,7 +63,7 @@ class VoiceRecordingViewModel @Inject constructor(
             _uiState.value = VoiceRecordingUiState(recordingState = State.RECORDING)
             startTimer()
         }.onFailure { ex ->
-            _uiState.value = _uiState.value.copy(recordingState = State.ERROR)
+            _uiState.value = VoiceRecordingUiState()
             viewModelScope.launch {
                 _events.emit(VoiceRecordingEvent.Error(ex.message ?: "Unable to start recording"))
             }
@@ -77,7 +80,7 @@ class VoiceRecordingViewModel @Inject constructor(
                 elapsedSeconds = (recording.durationMs / 1000).toInt()
             )
         }.onFailure { ex ->
-            _uiState.value = _uiState.value.copy(recordingState = State.ERROR)
+            _uiState.value = VoiceRecordingUiState()
             viewModelScope.launch {
                 _events.emit(VoiceRecordingEvent.Error(ex.message ?: "Unable to stop recording"))
             }
@@ -100,12 +103,20 @@ class VoiceRecordingViewModel @Inject constructor(
             }.onSuccess {
                 settingsRepository.setVoiceCloningEnabled(true)
                 pendingRecording = null
-                _uiState.value = _uiState.value.copy(recordingState = State.SUCCESS, progress = 100)
-                _events.emit(VoiceRecordingEvent.Success)
+                generateSample()
             }.onFailure { ex ->
-                _uiState.value = _uiState.value.copy(recordingState = State.ERROR)
+                _uiState.value = _uiState.value.copy(recordingState = State.STOPPED)
                 _events.emit(VoiceRecordingEvent.Error(ex.message ?: "Unable to save voice profile"))
             }
+        }
+    }
+
+    fun previewSample() {
+        viewModelScope.launch {
+            ttsManager.playVieneuClonePreview(PREVIEW_TEXT)
+                .onFailure {
+                    _events.emit(VoiceRecordingEvent.PreviewError)
+                }
         }
     }
 
@@ -118,6 +129,19 @@ class VoiceRecordingViewModel @Inject constructor(
     fun cancel() {
         timerJob?.cancel()
         voiceProfileManager.cancelRecording()
+        ttsManager.stop()
+    }
+
+    private suspend fun generateSample() {
+        _uiState.value = _uiState.value.copy(recordingState = State.GENERATING_SAMPLE, progress = 100)
+        ttsManager.generateVieneuClonePreview(PREVIEW_TEXT)
+            .onSuccess {
+                _uiState.value = _uiState.value.copy(recordingState = State.PREVIEW_READY)
+            }
+            .onFailure {
+                _uiState.value = _uiState.value.copy(recordingState = State.PREVIEW_READY)
+                _events.emit(VoiceRecordingEvent.PreviewError)
+            }
     }
 
     private fun startTimer() {
@@ -147,5 +171,9 @@ class VoiceRecordingViewModel @Inject constructor(
             voiceProfileManager.cancelRecording()
         }
         super.onCleared()
+    }
+
+    private companion object {
+        private const val PREVIEW_TEXT = "Con mu\u1ed1n u\u1ed1ng n\u01b0\u1edbc"
     }
 }

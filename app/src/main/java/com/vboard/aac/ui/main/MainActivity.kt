@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState != null) return
         lifecycleScope.launch {
             if (!preferencesDataStore.isOnboardingCompleted()) {
-                AlertDialog.Builder(this@MainActivity)
+                MaterialAlertDialogBuilder(this@MainActivity)
                     .setTitle(R.string.onboarding_pin_title)
                     .setMessage(R.string.onboarding_pin_message)
                     .setPositiveButton(R.string.action_done) { dialog, _ ->

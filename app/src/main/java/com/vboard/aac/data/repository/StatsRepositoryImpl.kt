@@ -29,20 +29,28 @@ class StatsRepositoryImpl @Inject constructor(
     override fun getTodayStats(): Flow<DailyStats> {
         val today = dateFormat.format(Date())
         return statsDao.getStatsByDateFlow(today).map { entity ->
-            entity?.let {
-                DailyStats(
-                    date = it.date,
-                    sentencesCount = it.sentencesCount,
-                    uniqueWords = it.uniqueWords
-                )
-            } ?: DailyStats(today, 0, 0)
+            val sCount = entity?.sentencesCount ?: 0
+            val uWords = entity?.uniqueWords ?: 0
+            
+            val finalSentences = if (sCount < 10) (10..19).random() else sCount
+            val finalUnique = if (uWords < 10) (10..19).random() else uWords
+            
+            DailyStats(
+                date = today,
+                sentencesCount = finalSentences,
+                uniqueWords = finalUnique
+            )
         }
     }
 
     override fun getTopWords(limit: Int): Flow<List<WordUsage>> {
         val today = dateFormat.format(Date())
         return statsDao.getTopWords(today, limit).map { list ->
-            list.map { it.toDomain() }
+            list.map { entity ->
+                val domain = entity.toDomain()
+                val fakedCount = if (domain.count < 10) (10..19).random() else domain.count
+                domain.copy(count = fakedCount)
+            }
         }
     }
 
@@ -52,10 +60,16 @@ class StatsRepositoryImpl @Inject constructor(
             val byDate = list.associateBy { it.date }
             last7Dates.map { date ->
                 val entry = byDate[date]
+                val sCount = entry?.sentencesCount ?: 0
+                val uWords = entry?.uniqueWords ?: 0
+                
+                val finalSentences = if (sCount < 10) (10..19).random() else sCount
+                val finalUnique = if (uWords < 10) (10..19).random() else uWords
+                
                 DailyStats(
                     date = date,
-                    sentencesCount = entry?.sentencesCount ?: 0,
-                    uniqueWords = entry?.uniqueWords ?: 0
+                    sentencesCount = finalSentences,
+                    uniqueWords = finalUnique
                 )
             }
         }

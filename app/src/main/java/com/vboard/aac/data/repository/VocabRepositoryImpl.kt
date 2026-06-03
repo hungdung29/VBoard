@@ -65,6 +65,9 @@ class VocabRepositoryImpl @Inject constructor(
         if (vocabCardDao.getCardCount() == 0) {
             categoryDao.insertCategories(DEFAULT_CATEGORIES.map { it.toEntity() })
             vocabCardDao.insertCards(DEFAULT_CARDS.map { it.toEntity() })
+        } else if (vocabCardDao.getCardById(PAIN_CARD.id) == null) {
+            vocabCardDao.shiftDisplayOrdersFrom(PAIN_CARD.displayOrder)
+            vocabCardDao.insertCard(PAIN_CARD.toEntity())
         }
     }
 
@@ -73,6 +76,8 @@ class VocabRepositoryImpl @Inject constructor(
     }
 
     companion object {
+        private val PAIN_CARD = VocabCard("c61", "Đau", "cat-5", displayOrder = 41)
+
         val DEFAULT_CATEGORIES = listOf(
             Category("cat-1", "Gia đình", "👨‍👩‍👧", "#FF6B6B", 1),
             Category("cat-2", "Ăn uống", "🍎", "#4ECDC4", 2),
@@ -131,28 +136,29 @@ class VocabRepositoryImpl @Inject constructor(
             VocabCard("c39", "Khát", "cat-5", displayOrder = 38),
             VocabCard("c40", "Nóng", "cat-5", displayOrder = 39),
             VocabCard("c41", "Lạnh", "cat-5", displayOrder = 40),
+            PAIN_CARD,
             // Hành động
-            VocabCard("c42", "Muốn", "cat-6", displayOrder = 41),
-            VocabCard("c43", "Cần", "cat-6", displayOrder = 42),
-            VocabCard("c44", "Đi", "cat-6", displayOrder = 43),
-            VocabCard("c45", "Ngủ", "cat-6", displayOrder = 44),
-            VocabCard("c46", "Tắm", "cat-6", displayOrder = 45),
-            VocabCard("c47", "Mặc", "cat-6", displayOrder = 46),
-            VocabCard("c48", "Đi học", "cat-6", displayOrder = 47),
-            VocabCard("c49", "Xem", "cat-6", displayOrder = 48),
+            VocabCard("c42", "Muốn", "cat-6", displayOrder = 42),
+            VocabCard("c43", "Cần", "cat-6", displayOrder = 43),
+            VocabCard("c44", "Đi", "cat-6", displayOrder = 44),
+            VocabCard("c45", "Ngủ", "cat-6", displayOrder = 45),
+            VocabCard("c46", "Tắm", "cat-6", displayOrder = 46),
+            VocabCard("c47", "Mặc", "cat-6", displayOrder = 47),
+            VocabCard("c48", "Đi học", "cat-6", displayOrder = 48),
+            VocabCard("c49", "Xem", "cat-6", displayOrder = 49),
             // Đồ vật
-            VocabCard("c50", "Bút", "cat-7", displayOrder = 49),
-            VocabCard("c51", "Giấy", "cat-7", displayOrder = 50),
-            VocabCard("c52", "Bảng", "cat-7", displayOrder = 51),
-            VocabCard("c53", "Điện thoại", "cat-7", displayOrder = 52),
-            VocabCard("c54", "Máy tính", "cat-7", displayOrder = 53),
-            VocabCard("c55", "Ô tô", "cat-7", displayOrder = 54),
+            VocabCard("c50", "Bút", "cat-7", displayOrder = 50),
+            VocabCard("c51", "Giấy", "cat-7", displayOrder = 51),
+            VocabCard("c52", "Bảng", "cat-7", displayOrder = 52),
+            VocabCard("c53", "Điện thoại", "cat-7", displayOrder = 53),
+            VocabCard("c54", "Máy tính", "cat-7", displayOrder = 54),
+            VocabCard("c55", "Ô tô", "cat-7", displayOrder = 55),
             // Nơi chốn
-            VocabCard("c56", "Trường", "cat-8", displayOrder = 55),
-            VocabCard("c57", "Bệnh viện", "cat-8", displayOrder = 56),
-            VocabCard("c58", "Công viên", "cat-8", displayOrder = 57),
-            VocabCard("c59", "Siêu thị", "cat-8", displayOrder = 58),
-            VocabCard("c60", "Biển", "cat-8", displayOrder = 59)
+            VocabCard("c56", "Trường", "cat-8", displayOrder = 56),
+            VocabCard("c57", "Bệnh viện", "cat-8", displayOrder = 57),
+            VocabCard("c58", "Công viên", "cat-8", displayOrder = 58),
+            VocabCard("c59", "Siêu thị", "cat-8", displayOrder = 59),
+            VocabCard("c60", "Biển", "cat-8", displayOrder = 60)
         )
     }
 }

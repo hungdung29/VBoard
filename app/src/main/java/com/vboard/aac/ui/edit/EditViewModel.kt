@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -66,13 +67,15 @@ class EditViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _isLoading.value = true
+            val existingCards = vocabRepo.getCardsByCategory(categoryId).first()
+            val maxOrder = existingCards.maxOfOrNull { it.displayOrder } ?: 0
             val card = VocabCard(
                 id = UUID.randomUUID().toString(),
                 word = word.trim(),
                 categoryId = categoryId,
                 localImagePath = imagePath,
                 isCustom = true,
-                displayOrder = 0
+                displayOrder = maxOrder + 1
             )
             vocabRepo.addCard(card)
             _message.value = "Đã thêm thẻ \"$word\""
@@ -105,6 +108,23 @@ class EditViewModel @Inject constructor(
         viewModelScope.launch {
             vocabRepo.deleteCard(id)
             _message.value = "Đã xóa thẻ"
+        }
+    }
+
+    fun updateCardsOrder(orderedCards: List<VocabCard>) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                val originalOrders = orderedCards.map { it.displayOrder }.sorted()
+                val updatedCards = orderedCards.mapIndexed { index, card ->
+                    card.copy(displayOrder = originalOrders[index])
+                }
+                vocabRepo.addCards(updatedCards)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
 

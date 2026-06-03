@@ -70,6 +70,15 @@ class StatsActivity : AppCompatActivity() {
                         binding.label6,
                         binding.label7
                     )
+                    val values = listOf(
+                        binding.value1,
+                        binding.value2,
+                        binding.value3,
+                        binding.value4,
+                        binding.value5,
+                        binding.value6,
+                        binding.value7
+                    )
 
                     val maxCount = state.weeklyStats.maxOfOrNull { it.sentencesCount } ?: 1
                     state.weeklyStats.forEachIndexed { index, stat ->
@@ -81,6 +90,7 @@ class StatsActivity : AppCompatActivity() {
                             params.height = height
                             bar.layoutParams = params
                         }
+                        values.getOrNull(index)?.text = stat.sentencesCount.toString()
                         labels.getOrNull(index)?.text = toWeekLabel(stat.date)
                     }
                 }

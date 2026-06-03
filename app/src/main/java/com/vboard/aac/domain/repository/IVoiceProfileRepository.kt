@@ -8,5 +8,6 @@ interface IVoiceProfileRepository {
     suspend fun getAllProfiles(): List<VoiceProfile>
     suspend fun deleteProfile(id: String): Result<Unit>
     suspend fun setActiveProfile(id: String, active: Boolean = true): Result<Unit>
+    suspend fun deactivateAll(): Result<Unit>
     suspend fun hasProfile(): Boolean
 }

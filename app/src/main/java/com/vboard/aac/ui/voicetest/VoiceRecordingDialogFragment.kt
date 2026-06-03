@@ -2,11 +2,14 @@ package com.vboard.aac.ui.voicetest
 
 import android.Manifest
 import android.app.Dialog
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.res.ColorStateList
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.provider.Settings
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
@@ -32,26 +35,20 @@ class VoiceRecordingDialogFragment : DialogFragment() {
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) viewModel.startRecording() else viewModel.onPermissionDenied()
+        if (granted) {
+            viewModel.startRecording()
+        } else {
+            viewModel.onPermissionDenied()
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return MaterialAlertDialogBuilder(requireContext()).create()
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = DialogVoiceRecordingBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        _binding = DialogVoiceRecordingBinding.inflate(layoutInflater)
         setupListeners()
         observeState()
+        return MaterialAlertDialogBuilder(requireContext())
+            .setView(binding.root)
+            .create()
     }
 
     private fun setupListeners() {
@@ -68,6 +65,14 @@ class VoiceRecordingDialogFragment : DialogFragment() {
             viewModel.saveProfile()
         }
 
+        binding.btnReplaySample.setOnClickListener {
+            viewModel.previewSample()
+        }
+
+        binding.btnDone.setOnClickListener {
+            dismiss()
+        }
+
         binding.btnCancel.setOnClickListener {
             viewModel.cancel()
             dismiss()
@@ -75,21 +80,26 @@ class VoiceRecordingDialogFragment : DialogFragment() {
     }
 
     private fun observeState() {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collectLatest { state ->
                     updateUI(state)
                 }
             }
         }
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.events.collectLatest { event ->
                     when (event) {
-                        is VoiceRecordingEvent.Success -> dismiss()
                         is VoiceRecordingEvent.Error -> showError(event.message)
+                        VoiceRecordingEvent.PreviewError -> {
+                            showError(getString(R.string.error_vieneu_preview))
+                        }
                         VoiceRecordingEvent.PermissionDenied -> {
                             binding.tvHint.text = getString(R.string.error_permission_denied)
+                            if (!shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO)) {
+                                showPermissionSettingsDialog()
+                            }
                         }
                     }
                 }
@@ -100,24 +110,57 @@ class VoiceRecordingDialogFragment : DialogFragment() {
     private fun updateUI(state: VoiceRecordingUiState) {
         binding.progressRecording.progress = state.progress
         binding.tvTimer.text = "${state.elapsedSeconds}s / ${state.targetSeconds}s"
+        binding.tvHint.setTextColor(
+            ContextCompat.getColor(requireContext(), R.color.on_surface_variant)
+        )
+        val recordColor = ContextCompat.getColor(
+            requireContext(),
+            if (state.recordingState == State.RECORDING) R.color.error else R.color.primary
+        )
+        binding.btnRecord.backgroundTintList = ColorStateList.valueOf(recordColor)
+        binding.tvRecordAction.setTextColor(recordColor)
 
         binding.tvHint.text = when (state.recordingState) {
             State.IDLE -> getString(R.string.hint_record_start)
             State.RECORDING -> getString(R.string.hint_recording)
             State.STOPPED -> getString(R.string.hint_review)
             State.SAVING -> getString(R.string.hint_saving)
+            State.GENERATING_SAMPLE -> getString(R.string.hint_generating_sample)
+            State.PREVIEW_READY -> getString(R.string.hint_preview_ready)
             else -> ""
         }
 
-        binding.btnRecord.text = when (state.recordingState) {
+        binding.tvRecordAction.text = when (state.recordingState) {
             State.IDLE -> getString(R.string.btn_record)
             State.RECORDING -> getString(R.string.btn_stop)
             State.STOPPED -> getString(R.string.btn_rerecord)
             else -> ""
         }
 
+        val recordingControlsVisible = state.recordingState in setOf(
+            State.IDLE,
+            State.RECORDING,
+            State.STOPPED
+        )
+        binding.btnRecord.visibility = if (recordingControlsVisible) View.VISIBLE else View.GONE
+        binding.tvRecordAction.visibility = if (recordingControlsVisible) View.VISIBLE else View.GONE
         binding.btnSave.visibility = if (state.recordingState == State.STOPPED) View.VISIBLE else View.GONE
-        binding.layoutProcessing.visibility = if (state.recordingState == State.SAVING) View.VISIBLE else View.GONE
+        binding.layoutActions.visibility =
+            if (state.recordingState == State.PREVIEW_READY) View.GONE else View.VISIBLE
+        binding.layoutPreviewActions.visibility =
+            if (state.recordingState == State.PREVIEW_READY) View.VISIBLE else View.GONE
+        binding.layoutProcessing.visibility =
+            if (state.recordingState == State.SAVING || state.recordingState == State.GENERATING_SAMPLE) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        binding.tvProcessingStatus.text =
+            if (state.recordingState == State.GENERATING_SAMPLE) {
+                getString(R.string.voice_recording_generating_sample)
+            } else {
+                getString(R.string.voice_recording_processing)
+            }
     }
 
     private fun showError(message: String) {
@@ -137,9 +180,30 @@ class VoiceRecordingDialogFragment : DialogFragment() {
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    private fun showPermissionSettingsDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.permission_required)
+            .setMessage(R.string.microphone_permission_rationale)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setPositiveButton(R.string.btn_open_settings) { _, _ ->
+                startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:${requireContext().packageName}")
+                    )
+                )
+            }
+            .show()
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        viewModel.cancel()
+        super.onDismiss(dialog)
+    }
+
+    override fun onDestroy() {
         _binding = null
+        super.onDestroy()
     }
 
     companion object {

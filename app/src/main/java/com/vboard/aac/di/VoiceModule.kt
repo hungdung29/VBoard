@@ -64,12 +64,10 @@ object VoicePlatformModule {
     @Singleton
     fun provideVoiceProfileManager(
         voiceRecordingManager: VoiceRecordingManager,
-        valtecTtsEngine: ValtecTtsEngine,
         voiceProfileRepository: IVoiceProfileRepository,
         audioQualityAnalyzer: AudioQualityAnalyzer
     ): VoiceProfileManager = VoiceProfileManager(
         voiceRecordingManager,
-        valtecTtsEngine,
         voiceProfileRepository,
         audioQualityAnalyzer
     )

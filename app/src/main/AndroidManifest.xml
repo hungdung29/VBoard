@@ -7,6 +7,7 @@
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -43,6 +44,10 @@
             android:name=".ui.edit.EditActivity"
             android:screenOrientation="portrait"
             android:parentActivityName=".ui.admin.AdminActivity" />
+
+        <activity
+            android:name=".ui.edit.CropActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".ui.voicetest.VoiceSettingsActivity"

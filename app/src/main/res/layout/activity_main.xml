@@ -34,11 +34,11 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
-        <ImageView
-            android:id="@+id/avatar"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/bg_avatar" />
+        <!-- Spacer to keep the title centered -->
+        <View
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <!-- Sentence Strip -->
@@ -121,7 +121,6 @@
         android:layout_marginTop="@dimen/spacing_md"
         android:clipToPadding="false"
         android:paddingHorizontal="@dimen/spacing_md"
-        android:paddingBottom="80dp"
         app:layout_constraintBottom_toTopOf="@id/bottomBar"
         app:layout_constraintTop_toBottomOf="@id/categoryScroll">
 

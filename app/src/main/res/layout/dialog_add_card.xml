@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -54,54 +55,38 @@
                 android:contentDescription="@string/add_card_pick_gallery" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/add_card_pick_gallery"
                 android:textColor="@color/on_surface_variant"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
         </LinearLayout>
     </LinearLayout>
 
     <!-- Image preview -->
-    <FrameLayout
+    <androidx.cardview.widget.CardView
         android:id="@+id/imageContainer"
         android:layout_width="match_parent"
         android:layout_height="120dp"
-        android:background="@drawable/bg_emoji_container"
-        android:layout_marginBottom="16dp">
+        app:cardBackgroundColor="@color/surface_container_low"
+        app:cardCornerRadius="@dimen/radius_xl"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="false"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/selectedImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:contentDescription="@string/add_card_tap_image"
-            android:scaleType="centerCrop"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/imagePlaceholder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:contentDescription="@string/add_card_tap_image" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/add_card_tap_image"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="14sp" />
-        </LinearLayout>
-    </FrameLayout>
+            android:scaleType="centerCrop" />
+    </androidx.cardview.widget.CardView>
 
     <!-- Word input -->
     <com.google.android.material.textfield.TextInputLayout
@@ -115,6 +100,21 @@
             android:layout_height="wrap_content"
             android:inputType="text"
             android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Category selection -->
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Chọn thư mục">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/selectCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none" />
     </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

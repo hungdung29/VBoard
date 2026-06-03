@@ -29,6 +29,8 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override val voiceCloningEnabled: Flow<Boolean> = dataStore.voiceCloningEnabled
 
+    override val vieneuServerUrl: Flow<String> = dataStore.vieneuServerUrl
+
     override val appSettings: Flow<AppSettings> = dataStore.appSettings
 
     override suspend fun setDarkMode(enabled: Boolean) {
